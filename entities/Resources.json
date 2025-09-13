@@ -1,0 +1,124 @@
+{
+  "name": "Resources",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Title/name of the resource"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the resource"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["food", "water", "medical", "shelter", "transportation", "communication", "security", "supplies", "evacuation", "personnel", "other"],
+      "description": "Category of resource"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["donation", "service", "facility", "equipment", "volunteer", "expertise"],
+      "description": "Type of resource being offered"
+    },
+    "quantity": {
+      "type": "number",
+      "minimum": 1,
+      "description": "Quantity available"
+    },
+    "unit": {
+      "type": "string",
+      "description": "Unit of measurement"
+    },
+    "location": {
+      "type": "object",
+      "properties": {
+        "latitude": {"type": "number"},
+        "longitude": {"type": "number"},
+        "address": {"type": "string"},
+        "serviceRadius": {"type": "number"}
+      },
+      "description": "Location of resource or service area"
+    },
+    "providerId": {
+      "type": "string",
+      "description": "ID of resource provider"
+    },
+    "providerInfo": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "organization": {"type": "string"},
+        "phone": {"type": "string"},
+        "email": {"type": "string"},
+        "verified": {"type": "boolean"}
+      },
+      "description": "Information about the resource provider"
+    },
+    "availability": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string", 
+          "enum": ["available", "limited", "reserved", "unavailable"]
+        },
+        "schedule": {"type": "string"},
+        "conditions": {"type": "string"}
+      },
+      "description": "Availability details"
+    },
+    "requirements": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Requirements or conditions for accessing resource"
+    },
+    "tags": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Tags for categorization and matching"
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "emergency"],
+      "description": "Priority level of resource offering"
+    },
+    "matchedNeeds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "needId": {"type": "string"},
+          "status": {"type": "string"},
+          "quantityAllocated": {"type": "number"},
+          "matchedAt": {"type": "string"}
+        }
+      },
+      "description": "Needs matched with this resource"
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["unverified", "pending", "verified", "flagged"],
+      "description": "Verification status of the resource"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive", "depleted", "expired"],
+      "description": "Current status of the resource"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the resource was created"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp"
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the resource offering expires"
+    }
+  },
+  "required": ["title", "description", "category", "type", "quantity", "location", "providerId", "status"]
+}

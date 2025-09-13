@@ -1,0 +1,365 @@
+{
+  "name": "ConflictZone",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Title/name of the conflict event"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the conflict"
+    },
+    "latitude": {
+      "type": "number",
+      "description": "Geographic latitude coordinate"
+    },
+    "longitude": {
+      "type": "number", 
+      "description": "Geographic longitude coordinate"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "critical"],
+      "description": "Severity level of the conflict"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "resolved", "escalating", "monitoring", "ongoing"],
+      "description": "Current status of the conflict"
+    },
+    "dateReported": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the conflict was first reported"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["news", "twitter", "telegram", "official", "witness", "social_media", "livestream"]
+          },
+          "url": {
+            "type": "string"
+          },
+          "credibility": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10
+          }
+        }
+      },
+      "description": "Sources reporting this conflict"
+    },
+    "casualties": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Number of casualties reported"
+    },
+    "involvedParties": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Parties involved in the conflict"
+    },
+    "location": {
+      "type": "string",
+      "description": "Specific location name"
+    },
+    "country": {
+      "type": "string",
+      "description": "Country where conflict is occurring"
+    },
+    "region": {
+      "type": "string",
+      "description": "Region/state/province"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags for categorization"
+    },
+    "conflictType": {
+      "type": "string",
+      "enum": ["military", "protest", "civil-unrest", "humanitarian", "environmental", "labor-dispute", "ethnic-conflict", "political", "war", "famine", "other"],
+      "description": "Type of conflict or civil activity"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Confidence level in the accuracy of the report (0-100)"
+    },
+    "verified": {
+      "type": "boolean",
+      "description": "Whether the conflict has been verified by multiple sources"
+    },
+    "realTimeUpdates": {
+      "type": "boolean",
+      "description": "Whether this conflict has real-time monitoring enabled"
+    },
+    "protestType": {
+      "type": "string",
+      "enum": ["peaceful", "violent", "mixed", "civil-disobedience"],
+      "description": "Type of protest (only applicable for protest-related conflicts)"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp"
+    },
+    "relatedCharities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the charity organization"
+          },
+          "description": {
+            "type": "string",
+            "description": "Brief description of what the charity aims to accomplish"
+          },
+          "trustworthinessRating": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10,
+            "description": "Trustworthiness rating from 0-10"
+          },
+          "websiteUrl": {
+            "type": "string",
+            "description": "Official website URL"
+          },
+          "donationUrl": {
+            "type": "string",
+            "description": "Direct donation link"
+          },
+          "focusAreas": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Areas of focus (e.g., medical aid, food, shelter)"
+          },
+          "verifiedStatus": {
+            "type": "boolean",
+            "description": "Whether the charity has been verified"
+          },
+          "registrationNumber": {
+            "type": "string",
+            "description": "Official charity registration number"
+          }
+        },
+        "required": ["name", "description", "trustworthinessRating"]
+      },
+      "description": "List of charities related to this conflict zone"
+    },
+    "submittedBy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the person submitting the conflict"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email of the submitter"
+        },
+        "organization": {
+          "type": "string",
+          "description": "Organization the submitter represents (optional)"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role or position of the submitter"
+        },
+        "isWitness": {
+          "type": "boolean",
+          "description": "Whether the submitter is a direct witness"
+        }
+      },
+      "description": "Information about who submitted this conflict report"
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["news", "social_media", "official_report", "witness_testimony", "academic_source", "ngo_report", "other"]
+          },
+          "title": {
+            "type": "string",
+            "description": "Title of the source"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL to the source"
+          },
+          "author": {
+            "type": "string",
+            "description": "Author or publisher of the source"
+          },
+          "publishedDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the source was published"
+          },
+          "accessedDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the source was accessed"
+          },
+          "credibilityRating": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10,
+            "description": "Credibility rating of this source"
+          },
+          "description": {
+            "type": "string",
+            "description": "Brief description of what this source provides"
+          },
+          "isVerified": {
+            "type": "boolean",
+            "description": "Whether this source has been independently verified"
+          }
+        },
+        "required": ["type", "title", "url", "credibilityRating"]
+      },
+      "description": "Citations and sources for this conflict report"
+    },
+    "geolocatedMedia": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["image", "video", "audio", "document"]
+          },
+          "url": {
+            "type": "string",
+            "description": "URL to the media file"
+          },
+          "filename": {
+            "type": "string",
+            "description": "Original filename"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what the media shows"
+          },
+          "capturedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the media was captured"
+          },
+          "geoLocation": {
+            "type": "object",
+            "properties": {
+              "latitude": {
+                "type": "number"
+              },
+              "longitude": {
+                "type": "number"
+              },
+              "accuracy": {
+                "type": "number",
+                "description": "GPS accuracy in meters"
+              },
+              "altitude": {
+                "type": "number",
+                "description": "Altitude in meters"
+              }
+            },
+            "required": ["latitude", "longitude"]
+          },
+          "verificationStatus": {
+            "type": "string",
+            "enum": ["unverified", "pending", "verified", "disputed"],
+            "description": "Verification status of this media"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata extracted from the file"
+          }
+        },
+        "required": ["type", "url", "description", "capturedAt"]
+      },
+      "description": "Geolocated media evidence for this conflict"
+    },
+    "associatedNeeds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": ["medical", "food", "shelter", "water", "clothing", "transportation", "communication", "security", "education", "psychological_support", "other"]
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description of the need"
+          },
+          "urgency": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"]
+          },
+          "quantity": {
+            "type": "string",
+            "description": "Estimated quantity needed"
+          },
+          "estimatedAffected": {
+            "type": "number",
+            "description": "Number of people affected by this need"
+          },
+          "specificRequirements": {
+            "type": "string",
+            "description": "Any specific requirements or details"
+          }
+        },
+        "required": ["category", "description", "urgency"]
+      },
+      "description": "Needs associated with this conflict zone"
+    },
+    "submissionStatus": {
+      "type": "string",
+      "enum": ["submitted", "under_review", "verified", "published", "rejected"],
+      "description": "Current status of this user-submitted conflict report"
+    },
+    "moderationNotes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string"
+          },
+          "moderator": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "action": {
+            "type": "string",
+            "enum": ["approve", "reject", "request_changes", "verify"]
+          }
+        },
+        "required": ["note", "timestamp"]
+      },
+      "description": "Moderation notes and actions taken on this submission"
+    }
+  },
+  "required": ["title", "latitude", "longitude", "dateReported", "status"]
+}

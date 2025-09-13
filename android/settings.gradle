@@ -1,0 +1,6 @@
+rootProject.name = 'CrisisConnect'
+apply from: file("../node_modules/expo/scripts/autolinking.gradle")
+useExpoModules()
+
+include ':app'
+includeBuild('../node_modules/@react-native/gradle-plugin')

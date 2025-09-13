@@ -1,0 +1,40 @@
+{
+  "name": "Charity",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "trustworthinessRating": {
+      "type": "number"
+    },
+    "websiteUrl": {
+      "type": "string"
+    },
+    "donationUrl": {
+      "type": "string"
+    },
+    "focusAreas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "verifiedStatus": {
+      "type": "boolean"
+    },
+    "registrationNumber": {
+      "type": "string"
+    },
+    "operatingRegions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["name", "description", "websiteUrl"]
+}

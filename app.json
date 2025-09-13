@@ -1,0 +1,64 @@
+{
+  "expo": {
+    "name": "ConflictConnect",
+    "slug": "conflictconnect",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "conflictconnect",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.conflictconnect.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "ConflictConnect uses location to verify your identity for OTG and Hand roles, and to provide relevant local resources and conflict information.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "ConflictConnect uses location to verify your identity for OTG and Hand roles, and to provide relevant local resources and conflict information."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.conflictconnect.app",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
+      "expo-font",
+      "expo-localization",
+      "expo-secure-store",
+      "expo-web-browser",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "ConflictConnect uses location to verify your identity for OTG and Hand roles, and to provide relevant local resources and conflict information.",
+          "locationWhenInUsePermission": "ConflictConnect uses location to verify your identity for OTG and Hand roles, and to provide relevant local resources and conflict information."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

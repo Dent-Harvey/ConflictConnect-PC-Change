@@ -1,0 +1,19 @@
+{
+  "recommendations": [
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-typescript-next",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "expo.vscode-expo-tools",
+    "ms-vscode.vscode-json",
+    "ms-vscode-remote.remote-containers",
+    "github.copilot",
+    "github.copilot-chat",
+    "ms-playwright.playwright",
+    "formulahendry.auto-rename-tag",
+    "bradlc.vscode-tailwindcss",
+    "christian-kohler.path-intellisense",
+    "visualstudioexptteam.vscodeintellicode",
+    "ms-vscode.vscode-react-native"
+  ]
+}

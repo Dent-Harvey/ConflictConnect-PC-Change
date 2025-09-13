@@ -1,0 +1,15 @@
+{
+  "notFound": {
+    "title": "Oops!",
+    "message": "This screen does not exist.",
+    "goHome": "Go to home screen!"
+  },
+  "needs": {
+    "suggestedTitle": "💡 Suggested Needs",
+    "suggestedSubtitle": "Based on the characteristics of {zoneName}, here are some supplies that might be helpful:",
+    "addSuggestion": "+ Add This Need",
+    "emptyTitle": "No needs added yet",
+    "emptySubtitle": "Add your first need to start connecting with available resources in conflict zones.",
+    "myNeeds": "My Needs"
+  }
+}

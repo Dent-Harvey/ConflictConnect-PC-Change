@@ -1,0 +1,188 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Firebase UID"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "username": {
+      "type": "string"
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "firstName": {
+      "type": "string"
+    },
+    "lastName": {
+      "type": "string"
+    },
+    "bio": {
+      "type": "string"
+    },
+    "profilePicture": {
+      "type": "string",
+      "format": "uri"
+    },
+    "phoneNumber": {
+      "type": "string"
+    },
+    "dateOfBirth": {
+      "type": "string",
+      "format": "date"
+    },
+    "location": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "zipCode": {
+          "type": "string"
+        },
+        "coordinates": {
+          "type": "object",
+          "properties": {
+            "latitude": {
+              "type": "number"
+            },
+            "longitude": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "socialLinks": {
+      "type": "object",
+      "properties": {
+        "website": {
+          "type": "string",
+          "format": "uri"
+        },
+        "twitter": {
+          "type": "string"
+        },
+        "instagram": {
+          "type": "string"
+        },
+        "facebook": {
+          "type": "string"
+        },
+        "linkedin": {
+          "type": "string"
+        },
+        "github": {
+          "type": "string"
+        },
+        "youtube": {
+          "type": "string"
+        },
+        "tiktok": {
+          "type": "string"
+        }
+      }
+    },
+    "preferences": {
+      "type": "object",
+      "properties": {
+        "theme": {
+          "type": "string",
+          "enum": ["light", "dark", "auto"]
+        },
+        "language": {
+          "type": "string"
+        },
+        "notifications": {
+          "type": "object",
+          "properties": {
+            "push": {
+              "type": "boolean"
+            },
+            "email": {
+              "type": "boolean"
+            },
+            "sms": {
+              "type": "boolean"
+            },
+            "conflictUpdates": {
+              "type": "boolean"
+            },
+            "resourceMatches": {
+              "type": "boolean"
+            }
+          }
+        },
+        "privacy": {
+          "type": "object",
+          "properties": {
+            "profileVisibility": {
+              "type": "string",
+              "enum": ["public", "private", "contacts"]
+            },
+            "locationSharing": {
+              "type": "boolean"
+            },
+            "activityStatus": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "verificationStatus": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "boolean"
+        },
+        "phone": {
+          "type": "boolean"
+        },
+        "identity": {
+          "type": "boolean"
+        },
+        "location": {
+          "type": "boolean"
+        }
+      }
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["user", "otg", "hand", "admin", "moderator"]
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastActive": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "isActive": {
+      "type": "boolean"
+    }
+  },
+  "required": ["id", "email", "username"]
+}

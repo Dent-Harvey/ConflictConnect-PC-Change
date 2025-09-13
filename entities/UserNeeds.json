@@ -1,0 +1,112 @@
+{
+  "name": "UserNeeds",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Title/name of the need"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of what is needed"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["food", "water", "medical", "shelter", "transportation", "communication", "security", "supplies", "evacuation", "other"],
+      "description": "Category of need"
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "critical", "emergency"],
+      "description": "Priority level of the need"
+    },
+    "urgency": {
+      "type": "string",
+      "enum": ["immediate", "within_hours", "within_days", "within_weeks", "not_urgent"],
+      "description": "Time sensitivity of the need"
+    },
+    "quantity": {
+      "type": "number",
+      "minimum": 1,
+      "description": "Quantity needed"
+    },
+    "unit": {
+      "type": "string",
+      "description": "Unit of measurement (people, liters, kg, etc.)"
+    },
+    "location": {
+      "type": "object",
+      "properties": {
+        "latitude": {"type": "number"},
+        "longitude": {"type": "number"},
+        "address": {"type": "string"},
+        "landmark": {"type": "string"}
+      },
+      "description": "Specific location where need exists"
+    },
+    "conflictZoneId": {
+      "type": "string",
+      "description": "ID of associated conflict zone"
+    },
+    "userId": {
+      "type": "string",
+      "description": "ID of user who reported the need"
+    },
+    "contactInfo": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "phone": {"type": "string"},
+        "email": {"type": "string"},
+        "preferredContact": {"type": "string"}
+      },
+      "description": "Contact information for coordination"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["open", "in_progress", "partially_fulfilled", "fulfilled", "cancelled", "expired"],
+      "description": "Current status of the need"
+    },
+    "tags": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Tags for categorization and search"
+    },
+    "fulfillmentRequests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "resourceId": {"type": "string"},
+          "providerId": {"type": "string"},
+          "status": {"type": "string"},
+          "quantity": {"type": "number"},
+          "estimatedDelivery": {"type": "string"},
+          "notes": {"type": "string"}
+        }
+      },
+      "description": "Requests to fulfill this need"
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["unverified", "pending", "verified", "flagged"],
+      "description": "Verification status of the need"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the need was created"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp"
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the need expires if not fulfilled"
+    }
+  },
+  "required": ["title", "description", "category", "priority", "location", "conflictZoneId", "userId", "status"]
+}
