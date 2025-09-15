@@ -31,9 +31,9 @@ jobs:
 
       - name: Archive and Export IPA
         run: |
-          SCHEME="YourSchemeName"
-          WORKSPACE="YourAppName.xcworkspace"
-          ARCHIVE_PATH="build/YourAppName.xcarchive"
+          SCHEME="CrisisConnect"
+          WORKSPACE="CrisisConnect.xcworkspace"
+          ARCHIVE_PATH="build/CrisisConnect.xcarchive"
           EXPORT_PATH="build/ExportedIPA"
           
           xcodebuild archive \
