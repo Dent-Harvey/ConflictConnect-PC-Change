@@ -7,7 +7,11 @@ const SMTP_CONFIG = {
   port: 465,
   secure: true, // SSL
   auth: {
+<<<<<<< HEAD
     user: 'crisisconnect@neffcreative.co',
+=======
+    user: 'conflictconnect@neffcreative.co',
+>>>>>>> 99ea8a17b977be2e268c62c2469b89c7368b1c40
     pass: 'MutualAid13',
   },
 };
@@ -24,10 +28,17 @@ async function testEmailConnection() {
     console.log('Sending test email...');
     const testEmail = {
       from: {
+<<<<<<< HEAD
         name: 'Crisis Connect Test',
         address: 'crisisconnect@neffcreative.co',
       },
       to: 'crisisconnect@neffcreative.co', // Send to self for testing
+=======
+        name: 'Conflict Connect Test',
+        address: 'conflictconnect@neffcreative.co',
+      },
+      to: 'conflictconnect@neffcreative.co', // Send to self for testing
+>>>>>>> 99ea8a17b977be2e268c62c2469b89c7368b1c40
       subject: 'Email Service Test',
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px;">

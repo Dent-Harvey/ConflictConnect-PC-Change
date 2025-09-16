@@ -6,11 +6,12 @@ import 'react-native-reanimated';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { View, Text } from 'react-native';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { errorHandler } from '@/utils/errorHandler';
 import { useEffect } from 'react';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { FirebaseAuthProvider } from '@/contexts/FirebaseAuthContext';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -51,44 +52,27 @@ export default function RootLayout() {
   });
 
   if (!loaded && !error) {
-    // Async font loading only occurs in development.
-    return null;
+    // Show loading screen while fonts are loading
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000000' }}>
+        <Text style={{ color: '#FFFFFF', fontSize: 16, fontFamily: 'System' }}>
+          Loading Conflict Connect...
+        </Text>
+      </View>
+    );
   }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
+        <FirebaseAuthProvider>
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
             <Stack>
-              <Stack.Screen name="index" options={{ headerShown: false }} />
-              <Stack.Screen name="email-test" options={{ headerShown: false }} />
-              <Stack.Screen 
-                name="(tabs)" 
-                options={{ 
-                  headerShown: false
-                }} 
-              />
-              <Stack.Screen 
-                name="resource-matches"
-                options={{ 
-                  headerShown: false,
-                  presentation: 'card'
-                }} 
-              />
-              <Stack.Screen 
-                name="conflict/[id]" 
-                options={{ 
-                  headerShown: true,
-                  presentation: 'card',
-                  headerTitle: 'Conflict Details'
-                }} 
-              />
               <Stack.Screen name="+not-found" />
             </Stack>
             <StatusBar style="auto" />
           </ThemeProvider>
-        </AuthProvider>
+        </FirebaseAuthProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>
   );

@@ -1,0 +1,30 @@
+{
+  "notFound": {
+    "title": "Ups!",
+    "message": "Bu ekran mevcut değil.",
+    "goHome": "Ana ekrana git!"
+  },
+  "needs": {
+    "suggestedTitle": "💡 Önerilen İhtiyaçlar",
+    "suggestedSubtitle": "{zoneName} özelliklerine dayanarak, yararlı olabilecek bazı malzemeler:",
+    "addSuggestion": "+ Bu İhtiyacı Ekle",
+    "emptyTitle": "Henüz ihtiyaç eklenmedi",
+    "emptySubtitle": "Çatışma bölgelerindeki mevcut kaynaklarla bağlantı kurmaya başlamak için ilk ihtiyacınızı ekleyin.",
+    "myNeeds": "İhtiyaçlarım"
+  },
+  "profile": {
+    "title": "Profil",
+    "firstName": "Ad",
+    "lastName": "Soyad",
+    "email": "E-posta",
+    "phoneNumber": "Telefon Numarası",
+    "organization": "Organizasyon",
+    "jobTitle": "İş Unvanı",
+    "bio": "Biyografi",
+    "languages": "Diller",
+    "location": "Konum",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "required": "Gerekli"
+  }
+}

@@ -1,7 +1,8 @@
-import { ConflictZone, ConflictZoneResponse, ConflictFilters, ConflictSource } from '@/types/conflict';
 import { project_id } from '@/9gen_config.json';
+import { ConflictFilters, ConflictSource, ConflictZone } from '@/types/conflict';
 
 const DB_API_BASE_URL = 'https://api.9gen.dev/api';
+const NEWS_SCRAPING_API_BASE = process.env.EXPO_PUBLIC_NEWS_API_URL || 'https://conflictconnect-news.neffcreative.co';
 
 export class ConflictService {
   private static async makeRequest<T>(
@@ -30,6 +31,72 @@ export class ConflictService {
     const jsonResponse = await response.json();
     console.log('API Response JSON:', jsonResponse);
     return jsonResponse;
+  }
+
+  /**
+   * Triggers news scraping to update conflicts with latest information
+   */
+  static async triggerNewsUpdate(): Promise<boolean> {
+    try {
+      const response = await fetch(`${NEWS_SCRAPING_API_BASE}/api/scrape-news`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`News scraping failed: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('[CONFLICT SERVICE] News scraping triggered:', result.message);
+      return result.success;
+    } catch (error) {
+      console.error('[CONFLICT SERVICE] Failed to trigger news update:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Gets latest news articles
+   */
+  static async getLatestNews(): Promise<any[]> {
+    try {
+      const response = await fetch(`${NEWS_SCRAPING_API_BASE}/api/latest-news`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch news: ${response.status}`);
+      }
+
+      const result = await response.json();
+      return result.success ? result.articles : [];
+    } catch (error) {
+      console.error('[CONFLICT SERVICE] Failed to fetch latest news:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Gets conflicts with real-time updates enabled
+   */
+  static async getRealTimeConflictZones(filters?: ConflictFilters): Promise<ConflictZone[]> {
+    try {
+      // First, try to trigger a news update if it's been a while since last update
+      await this.triggerNewsUpdate();
+
+      // Then get the updated conflicts
+      return await this.getConflictZones(filters);
+    } catch (error) {
+      console.error('[CONFLICT SERVICE] Failed to get real-time conflicts:', error);
+      // Fallback to regular conflict fetching
+      return await this.getConflictZones(filters);
+    }
   }
 
   static async getConflictZones(filters?: ConflictFilters): Promise<ConflictZone[]> {

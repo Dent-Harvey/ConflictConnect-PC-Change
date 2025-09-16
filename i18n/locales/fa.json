@@ -1,0 +1,30 @@
+{
+  "notFound": {
+    "title": "اوه!",
+    "message": "این صفحه وجود ندارد.",
+    "goHome": "برو به صفحه اصلی!"
+  },
+  "needs": {
+    "suggestedTitle": "💡 نیازهای پیشنهادی",
+    "suggestedSubtitle": "بر اساس ویژگی‌های {zoneName}، در اینجا برخی از تدارکات که ممکن است مفید باشند:",
+    "addSuggestion": "+ این نیاز را اضافه کن",
+    "emptyTitle": "هنوز نیازی اضافه نشده",
+    "emptySubtitle": "اولین نیاز خود را اضافه کنید تا شروع به ارتباط با منابع موجود در مناطق درگیری کنید.",
+    "myNeeds": "نیازهای من"
+  },
+  "profile": {
+    "title": "پروفایل",
+    "firstName": "نام",
+    "lastName": "نام خانوادگی",
+    "email": "ایمیل",
+    "phoneNumber": "شماره تلفن",
+    "organization": "سازمان",
+    "jobTitle": "عنوان شغل",
+    "bio": "بیوگرافی",
+    "languages": "زبان‌ها",
+    "location": "مکان",
+    "save": "ذخیره",
+    "cancel": "لغو",
+    "required": "الزامی"
+  }
+}

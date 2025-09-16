@@ -1,20 +1,22 @@
 {
   "expo": {
-    "name": "ConflictConnect",
-    "slug": "conflictconnect",
+    "name": "Conflict\\Connect",
+    "slug": "crisisconnect",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "conflictconnect",
+    "scheme": "crisisconnect",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.conflictconnect.app",
+      "bundleIdentifier": "com.crisisconnect.app",
       "buildNumber": "1",
+      "deploymentTarget": "13.4",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "ConflictConnect uses location to verify your identity for OTG and Hand roles, and to provide relevant local resources and conflict information.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "ConflictConnect uses location to verify your identity for OTG and Hand roles, and to provide relevant local resources and conflict information."
+        "NSLocationWhenInUseUsageDescription": "Crisis Connect uses location to verify your identity for OTG and Hand roles, and to provide relevant local resources and conflict information.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Crisis Connect uses location to verify your identity for OTG and Hand roles, and to provide relevant local resources and conflict information.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -22,7 +24,9 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.conflictconnect.app",
+      "package": "com.crisisconnect.app",
+      "compileSdkVersion": 34,
+      "targetSdkVersion": 34,
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
@@ -54,8 +58,8 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "ConflictConnect uses location to verify your identity for OTG and Hand roles, and to provide relevant local resources and conflict information.",
-          "locationWhenInUsePermission": "ConflictConnect uses location to verify your identity for OTG and Hand roles, and to provide relevant local resources and conflict information."
+          "locationAlwaysAndWhenInUsePermission": "Crisis Connect uses location to verify your identity for OTG and Hand roles, and to provide relevant local resources and conflict information.",
+          "locationWhenInUsePermission": "Crisis Connect uses location to verify your identity for OTG and Hand roles, and to provide relevant local resources and conflict information."
         }
       ]
     ],
@@ -65,7 +69,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "67622a4f-e756-42ee-bef7-4e7ae334289f"
+        "projectId": "d2b9eb9c-b6e5-45d5-a22c-95440a5a21a4"
       }
     }
   }

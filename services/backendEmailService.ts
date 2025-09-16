@@ -1,5 +1,3 @@
-import { errorHandler } from '@/utils/errorHandler';
-import { project_id } from '@/9gen_config.json';
 
 /**
  * Backend-compatible email service for React Native
@@ -19,8 +17,8 @@ export interface EmailServiceRequest {
   text: string;
 }
 
-// Backend API base URL - you'll need to replace this with your actual backend server
-const BACKEND_API_BASE = process.env.EXPO_PUBLIC_BACKEND_API_URL || 'https://your-backend-server.com/api';
+// Backend API base URL - using production backend server
+const BACKEND_API_BASE = process.env.EXPO_PUBLIC_BACKEND_API_URL || 'https://conflictconnect-email.neffcreative.co';
 
 /**
  * Generates a random 6-digit verification code
@@ -42,23 +40,19 @@ export const sendVerificationEmail = async (
     
     const emailRequest: EmailServiceRequest = {
       to: email,
-      subject: 'Crisis Connect - Verify Your Email',
+      subject: 'Conflict\Connect - Verify Your Email',
       html: createVerificationEmailHTML(code),
       text: createVerificationEmailText(code),
     };
     
-    const response = await fetch(`${BACKEND_API_BASE}/email/send-verification`, {
+    const response = await fetch(`${BACKEND_API_BASE}/api/email/send-verification`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        project_id,
-        email: emailRequest,
-        from: {
-          name: 'Crisis Connect',
-          email: 'conflictconnect@neffcreative.co',
-        },
+        email,
+        code,
       }),
     });
     
@@ -105,8 +99,8 @@ export const sendVerificationEmailViaAI = async (
     console.log(`[AI EMAIL SERVICE] Requesting verification email via AI service for: ${email}`);
     
     const prompt = `Send a verification email to ${email} with the code ${code}. Use the following details:
-- From: Crisis Connect <conflictconnect@neffcreative.co>
-- Subject: Crisis Connect - Verify Your Email
+- From: Conflict\Connect <conflictconnect@neffcreative.co>
+- Subject: Conflict\Connect - Verify Your Email
 - Include the 6-digit code prominently in the email
 - Make it professional and friendly
 - Explain that the code expires in 10 minutes`;
@@ -161,7 +155,7 @@ const createVerificationEmailHTML = (code: string): string => {
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       <h2 style="color: #333; text-align: center;">Email Verification</h2>
       <p style="color: #666; font-size: 16px; line-height: 1.5;">
-        Thank you for joining Crisis Connect. Please enter the verification code below in the app to verify your email:
+        Thank you for joining Conflict\Connect. Please enter the verification code below in the app to verify your email:
       </p>
       <div style="text-align: center; margin: 30px 0;">
         <h1 style="
@@ -184,7 +178,7 @@ const createVerificationEmailHTML = (code: string): string => {
       </p>
       <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
       <p style="color: #999; font-size: 12px; text-align: center;">
-        Crisis Connect - Connecting those who can help with those who need it
+        Conflict\Connect - Connecting those who can help with those who need it
       </p>
     </div>
   `;
@@ -197,7 +191,7 @@ const createVerificationEmailText = (code: string): string => {
   return `
 Email Verification
 
-Thank you for joining Crisis Connect. Please enter the verification code below in the app to verify your email:
+Thank you for joining Conflict\Connect. Please enter the verification code below in the app to verify your email:
 
 ${code}
 
@@ -205,7 +199,7 @@ This code will expire in 10 minutes.
 
 If you didn't request this verification, please ignore this email.
 
-Crisis Connect - Connecting those who can help with those who need it
+Conflict\Connect - Connecting those who can help with those who need it
   `;
 };
 

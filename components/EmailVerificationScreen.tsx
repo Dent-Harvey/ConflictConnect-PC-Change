@@ -1,30 +1,27 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Keyboard,
-  ActivityIndicator,
-} from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { 
-  FadeInDown, 
-  FadeIn, 
-  SlideInRight, 
-  SlideOutLeft,
-  LinearTransition,
-  FadeInUp
-} from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
 import { PressableScale } from '@/components/ui/PressableScale';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/hooks/useTheme';
-import { validateVerificationCode } from '@/services/emailService';
+import { validateVerificationCode } from '@/services/backendEmailService';
 import { errorHandler } from '@/utils/errorHandler';
+import * as Haptics from 'expo-haptics';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+    ActivityIndicator,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    Text,
+    TextInput,
+    View
+} from 'react-native';
+import Animated, {
+    FadeIn,
+    FadeInUp,
+    LinearTransition,
+    SlideInRight
+} from 'react-native-reanimated';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const AnimatedPressableScale = Animated.createAnimatedComponent(PressableScale);
 

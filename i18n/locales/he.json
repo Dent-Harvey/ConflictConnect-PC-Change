@@ -1,0 +1,30 @@
+{
+  "notFound": {
+    "title": "אופס!",
+    "message": "המסך הזה לא קיים.",
+    "goHome": "עבור למסך הבית!"
+  },
+  "needs": {
+    "suggestedTitle": "💡 צרכים מוצעים",
+    "suggestedSubtitle": "תבסס על המאפיינים של {zoneName}, הנה כמה אספקה שעשויה להיות מועילה:",
+    "addSuggestion": "+ הוסף צורך זה",
+    "emptyTitle": "עדיין לא נוספו צרכים",
+    "emptySubtitle": "הוסף את הצורך הראשון שלך כדי להתחיל להתחבר למשאבים זמינים באזורי קונפליקט.",
+    "myNeeds": "הצרכים שלי"
+  },
+  "profile": {
+    "title": "פרופיל",
+    "firstName": "שם פרטי",
+    "lastName": "שם משפחה",
+    "email": "אימייל",
+    "phoneNumber": "מספר טלפון",
+    "organization": "ארגון",
+    "jobTitle": "תפקיד",
+    "bio": "ביוגרפיה",
+    "languages": "שפות",
+    "location": "מיקום",
+    "save": "שמור",
+    "cancel": "בטל",
+    "required": "נדרש"
+  }
+}

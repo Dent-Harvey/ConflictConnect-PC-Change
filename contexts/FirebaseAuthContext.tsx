@@ -1,229 +1,422 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { 
   User as FirebaseUser,
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
   sendEmailVerification,
-  updateProfile as updateFirebaseProfile,
+  updateProfile
 } from 'firebase/auth';
-import { auth } from '@/config/firebase';
-import { User } from '@/types/user';
-import { userService } from '@/services/userService';
+import { 
+  doc, 
+  setDoc, 
+  getDoc, 
+  updateDoc, 
+  collection, 
+  query, 
+  where, 
+  getDocs,
+  serverTimestamp
+} from 'firebase/firestore';
+import { auth, db } from '@/config/firebase';
+import { User, UserRole, AuthContextType, UserProfile } from '@/types/auth';
 import { errorHandler } from '@/utils/errorHandler';
+import { sendVerificationEmail, generateVerificationCode } from '@/services/backendEmailService';
 
-interface FirebaseAuthContextType {
-  user: User | null;
-  firebaseUser: FirebaseUser | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, userData: { username: string; displayName?: string }) => Promise<void>;
-  signOut: () => Promise<void>;
-  sendEmailVerification: () => Promise<void>;
-  updateUserProfile: (data: Partial<User>) => Promise<void>;
-}
+const FirebaseAuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const FirebaseAuthContext = createContext<FirebaseAuthContextType | undefined>(undefined);
+const AUTH_STORAGE_KEY = '@conflict_connect_auth';
+const PROFILE_STORAGE_KEY = '@conflict_connect_profile';
 
 export const FirebaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [pendingVerification, setPendingVerification] = useState<{ email: string; role: UserRole } | null>(null);
+  const [needsProfileSetup, setNeedsProfileSetup] = useState(false);
 
+  // Listen to Firebase auth state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      try {
-        console.log('[FIREBASE AUTH] Auth state changed:', firebaseUser?.uid);
-        
-        if (firebaseUser) {
-          // User is signed in, load their profile data
-          setFirebaseUser(firebaseUser);
-          const userData = await userService.getUserById(firebaseUser.uid);
-          
-          if (userData) {
-            setUser(userData);
-            // Update last active timestamp
-            await userService.updateLastActive(firebaseUser.uid);
-          } else {
-            // User exists in Firebase but not in Firestore
-            // This shouldn't happen in normal flow, but let's handle it
-            console.log('[FIREBASE AUTH] User exists in Firebase but not in Firestore');
-            setUser(null);
-          }
-        } else {
-          // User is signed out
-          setFirebaseUser(null);
-          setUser(null);
-        }
-      } catch (error) {
-        errorHandler({
-          filePath: '/contexts/FirebaseAuthContext.tsx',
-          functionName: 'onAuthStateChanged',
-          error: error as Error
-        });
-        // Even if we can't load user data, set the Firebase user
+      if (firebaseUser) {
         setFirebaseUser(firebaseUser);
+        await loadUserProfile(firebaseUser);
+      } else {
+        setFirebaseUser(null);
         setUser(null);
-      } finally {
-        setIsLoading(false);
+        setNeedsProfileSetup(false);
+        await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
+        await AsyncStorage.removeItem(PROFILE_STORAGE_KEY);
       }
+      setIsLoading(false);
     });
 
-    return () => unsubscribe();
+    return unsubscribe;
   }, []);
 
-  const signIn = async (email: string, password: string): Promise<void> => {
+  const loadUserProfile = async (firebaseUser: FirebaseUser) => {
     try {
-      setIsLoading(true);
-      console.log('[FIREBASE AUTH] Signing in user:', email);
-      
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log('[FIREBASE AUTH] Sign in successful:', userCredential.user.uid);
-      
-      // The onAuthStateChanged listener will handle loading user data
+      // Check if user has a profile in Firestore
+      const userDocRef = doc(db, 'users', firebaseUser.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data() as UserProfile;
+        
+        // Check if profile is complete
+        const isProfileComplete = userData.firstName && 
+                                 userData.email && 
+                                 userData.location;
+
+        if (isProfileComplete) {
+          // User has complete profile
+          const user: User = {
+            id: firebaseUser.uid,
+            email: firebaseUser.email || '',
+            role: userData.role || 'civilian',
+            profile: userData,
+            verified: firebaseUser.emailVerified,
+            createdAt: userData.createdAt?.toDate() || new Date(),
+            lastActive: new Date()
+          };
+
+          setUser(user);
+          setNeedsProfileSetup(false);
+          await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+        } else {
+          // User needs to complete profile setup
+          setNeedsProfileSetup(true);
+          setUser({
+            id: firebaseUser.uid,
+            email: firebaseUser.email || '',
+            role: userData.role || 'civilian',
+            verified: firebaseUser.emailVerified,
+            createdAt: userData.createdAt?.toDate() || new Date(),
+            lastActive: new Date()
+          });
+        }
+      } else {
+        // New user - needs profile setup
+        setNeedsProfileSetup(true);
+        setUser({
+          id: firebaseUser.uid,
+          email: firebaseUser.email || '',
+          role: 'civilian', // Default role
+          verified: firebaseUser.emailVerified,
+          createdAt: new Date(),
+          lastActive: new Date()
+        });
+      }
     } catch (error) {
+      console.error('Error loading user profile:', error);
       errorHandler({
-        filePath: '/contexts/FirebaseAuthContext.tsx',
-        functionName: 'signIn',
+        filePath: 'contexts/FirebaseAuthContext.tsx',
+        functionName: 'loadUserProfile',
         error: error as Error
       });
+    }
+  };
+
+  const login = async (role: UserRole, email?: string, password?: string) => {
+    try {
+      setIsLoading(true);
+
+      // Handle conflict controller authentication
+      if (role === 'conflict_controller') {
+        if (password !== 'mutual aid') {
+          throw new Error('Invalid password for conflict controller access');
+        }
+        
+        // For conflict controllers, create a temporary user session
+        const tempUser: User = {
+          id: 'conflict_controller_' + Date.now(),
+          email: email || 'conflict.controller@conflictconnect.app',
+          role: 'conflict_controller',
+          verified: true,
+          createdAt: new Date(),
+          lastActive: new Date()
+        };
+
+        setUser(tempUser);
+        await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(tempUser));
+        setIsLoading(false);
+        return tempUser;
+      }
+
+      // Handle civilian authentication with email verification
+      if (!email) {
+        throw new Error('Email is required for civilian authentication');
+      }
+
+      // Generate verification code
+      const verificationCode = generateVerificationCode();
+      
+      // Send verification email
+      const emailResult = await sendVerificationEmail(email, verificationCode);
+      
+      if (!emailResult.success) {
+        throw new Error('Failed to send verification email');
+      }
+
+      // Store pending verification
+      setPendingVerification({ email, role });
+      setIsLoading(false);
+
+      return { email, verificationCode };
+    } catch (error) {
+      setIsLoading(false);
       throw error;
     }
   };
 
-  const signUp = async (
-    email: string, 
-    password: string, 
-    userData: { username: string; displayName?: string }
-  ): Promise<void> => {
+  const verifyEmailAndCreateUser = async (email: string, code: string, role: UserRole = 'civilian') => {
     try {
       setIsLoading(true);
-      console.log('[FIREBASE AUTH] Creating new user:', email);
-      
-      // Check if username is available
-      const isUsernameAvailable = await userService.isUsernameAvailable(userData.username);
-      if (!isUsernameAvailable) {
-        throw new Error('Username is already taken');
-      }
-      
-      // Create Firebase user
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+      // For now, we'll create the Firebase user directly
+      // In production, you might want to verify the code first
+      const userCredential = await createUserWithEmailAndPassword(auth, email, `temp_${Date.now()}`);
       const firebaseUser = userCredential.user;
-      
-      console.log('[FIREBASE AUTH] Firebase user created:', firebaseUser.uid);
-      
-      // Update Firebase profile
-      if (userData.displayName) {
-        await updateFirebaseProfile(firebaseUser, {
-          displayName: userData.displayName,
-        });
-      }
-      
-      // Create user document in Firestore
-      const newUser = await userService.createUser(firebaseUser.uid, {
-        email: firebaseUser.email!,
-        username: userData.username,
-        displayName: userData.displayName,
+
+      // Create initial user document in Firestore
+      const initialProfile: Partial<UserProfile> = {
+        role,
+        email,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        isProfileComplete: false
+      };
+
+      const userDocRef = doc(db, 'users', firebaseUser.uid);
+      await setDoc(userDocRef, initialProfile);
+
+      // Update Firebase user profile
+      await updateProfile(firebaseUser, {
+        displayName: role
       });
-      
-      console.log('[FIREBASE AUTH] User document created in Firestore');
-      
+
       // Send email verification
       await sendEmailVerification(firebaseUser);
-      console.log('[FIREBASE AUTH] Email verification sent');
-      
-      // The onAuthStateChanged listener will handle setting the user state
+
+      setPendingVerification(null);
+      setNeedsProfileSetup(true);
+      setIsLoading(false);
+
+      return firebaseUser;
     } catch (error) {
-      errorHandler({
-        filePath: '/contexts/FirebaseAuthContext.tsx',
-        functionName: 'signUp',
-        error: error as Error
-      });
+      setIsLoading(false);
+      console.error('Error creating user:', error);
       throw error;
     }
   };
 
-  const handleSignOut = async (): Promise<void> => {
-    try {
-      console.log('[FIREBASE AUTH] Signing out user');
-      await signOut(auth);
-      console.log('[FIREBASE AUTH] Sign out successful');
-    } catch (error) {
-      errorHandler({
-        filePath: '/contexts/FirebaseAuthContext.tsx',
-        functionName: 'handleSignOut',
-        error: error as Error
-      });
-      throw error;
-    }
-  };
-
-  const handleSendEmailVerification = async (): Promise<void> => {
+  const completeProfileSetup = async (profileData: UserProfile) => {
     try {
       if (!firebaseUser) {
-        throw new Error('No user is currently signed in');
+        throw new Error('No authenticated user');
       }
-      
-      console.log('[FIREBASE AUTH] Sending email verification');
-      await sendEmailVerification(firebaseUser);
-      console.log('[FIREBASE AUTH] Email verification sent successfully');
+
+      setIsLoading(true);
+
+      // Update user document in Firestore
+      const userDocRef = doc(db, 'users', firebaseUser.uid);
+      const completeProfile = {
+        ...profileData,
+        updatedAt: serverTimestamp(),
+        isProfileComplete: true
+      };
+
+      await updateDoc(userDocRef, completeProfile);
+
+      // Update local user state
+      const updatedUser: User = {
+        id: firebaseUser.uid,
+        email: firebaseUser.email || '',
+        role: profileData.role || 'civilian',
+        profile: completeProfile as UserProfile,
+        verified: firebaseUser.emailVerified,
+        createdAt: profileData.createdAt?.toDate() || new Date(),
+        lastActive: new Date()
+      };
+
+      setUser(updatedUser);
+      setNeedsProfileSetup(false);
+      await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updatedUser));
+      await AsyncStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(completeProfile));
+
+      setIsLoading(false);
+      return updatedUser;
     } catch (error) {
-      errorHandler({
-        filePath: '/contexts/FirebaseAuthContext.tsx',
-        functionName: 'handleSendEmailVerification',
-        error: error as Error
-      });
+      setIsLoading(false);
+      console.error('Error completing profile setup:', error);
       throw error;
     }
   };
 
-  const updateUserProfile = async (data: Partial<User>): Promise<void> => {
+  const updateUserProfile = async (updates: Partial<UserProfile>) => {
     try {
       if (!firebaseUser || !user) {
-        throw new Error('User not authenticated');
+        throw new Error('No authenticated user');
       }
-      
-      console.log('[FIREBASE AUTH] Updating user profile');
-      
-      // Update Firebase profile if display name changed
-      if (data.displayName && data.displayName !== firebaseUser.displayName) {
-        await updateFirebaseProfile(firebaseUser, {
-          displayName: data.displayName,
-        });
-      }
-      
-      // Update Firestore document
-      await userService.updateUser(firebaseUser.uid, data);
-      
-      // Reload user data
-      const updatedUser = await userService.getUserById(firebaseUser.uid);
-      if (updatedUser) {
-        setUser(updatedUser);
-      }
-      
-      console.log('[FIREBASE AUTH] User profile updated successfully');
+
+      setIsLoading(true);
+
+      // Update user document in Firestore
+      const userDocRef = doc(db, 'users', firebaseUser.uid);
+      const updateData = {
+        ...updates,
+        updatedAt: serverTimestamp()
+      };
+
+      await updateDoc(userDocRef, updateData);
+
+      // Update local user state
+      const updatedProfile = { ...user.profile, ...updates };
+      const updatedUser = { ...user, profile: updatedProfile };
+
+      setUser(updatedUser);
+      await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updatedUser));
+      await AsyncStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(updatedProfile));
+
+      setIsLoading(false);
+      return updatedUser;
     } catch (error) {
-      errorHandler({
-        filePath: '/contexts/FirebaseAuthContext.tsx',
-        functionName: 'updateUserProfile',
-        error: error as Error
-      });
+      setIsLoading(false);
+      console.error('Error updating user profile:', error);
       throw error;
     }
   };
 
-  const value: FirebaseAuthContextType = {
+  const logout = async () => {
+    try {
+      setIsLoading(true);
+      await signOut(auth);
+      // Auth state change will handle the rest
+    } catch (error) {
+      console.error('Error logging out:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateLocation = async (location: any) => {
+    try {
+      if (!user) return;
+
+      const locationData = {
+        latitude: location.latitude,
+        longitude: location.longitude,
+        accuracy: location.accuracy,
+        timestamp: new Date().toISOString()
+      };
+
+      await updateUserProfile({ location: locationData });
+    } catch (error) {
+      console.error('Error updating location:', error);
+    }
+  };
+
+  const updateUserRole = async (role: UserRole) => {
+    try {
+      if (!user) return;
+      await updateUserProfile({ role });
+    } catch (error) {
+      console.error('Error updating user role:', error);
+      throw error;
+    }
+  };
+
+  // Get users by role for matching needs and resources
+  const getUsersByRole = async (role: UserRole, limit: number = 50) => {
+    try {
+      const usersRef = collection(db, 'users');
+      const q = query(
+        usersRef, 
+        where('role', '==', role),
+        where('isProfileComplete', '==', true)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      const users: UserProfile[] = [];
+      
+      querySnapshot.forEach((doc) => {
+        const userData = doc.data() as UserProfile;
+        users.push({ ...userData, id: doc.id });
+      });
+
+      return users;
+    } catch (error) {
+      console.error('Error getting users by role:', error);
+      return [];
+    }
+  };
+
+  // Get users by location for local matching
+  const getUsersByLocation = async (latitude: number, longitude: number, radiusKm: number = 50) => {
+    try {
+      // This is a simplified version - in production you'd use GeoFirestore
+      const usersRef = collection(db, 'users');
+      const q = query(
+        usersRef,
+        where('isProfileComplete', '==', true)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      const nearbyUsers: UserProfile[] = [];
+      
+      querySnapshot.forEach((doc) => {
+        const userData = doc.data() as UserProfile;
+        if (userData.location) {
+          // Simple distance calculation (not optimized for large datasets)
+          const distance = calculateDistance(
+            latitude, longitude,
+            userData.location.latitude, userData.location.longitude
+          );
+          
+          if (distance <= radiusKm) {
+            nearbyUsers.push({ ...userData, id: doc.id });
+          }
+        }
+      });
+
+      return nearbyUsers;
+    } catch (error) {
+      console.error('Error getting users by location:', error);
+      return [];
+    }
+  };
+
+  // Helper function to calculate distance between two points
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const distance = R * c;
+    return distance;
+  };
+
+  const value: AuthContextType = {
     user,
-    firebaseUser,
-    isAuthenticated: !!firebaseUser,
     isLoading,
-    signIn,
-    signUp,
-    signOut: handleSignOut,
-    sendEmailVerification: handleSendEmailVerification,
+    pendingVerification,
+    needsProfileSetup,
+    login,
+    verifyEmailAndCreateUser,
+    completeProfileSetup,
     updateUserProfile,
+    logout,
+    updateLocation,
+    updateUserRole,
+    getUsersByRole,
+    getUsersByLocation
   };
 
   return (
@@ -240,6 +433,3 @@ export const useFirebaseAuth = () => {
   }
   return context;
 };
-
-// Keep the original useAuth export for backward compatibility
-export const useAuth = useFirebaseAuth;

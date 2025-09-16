@@ -322,6 +322,55 @@ export const ConflictMap: React.FC<ConflictMapProps> = ({
   );
 };
 
+// Memoized marker components to prevent unnecessary re-renders
+const ConflictMarkerComponent = React.memo<{
+  conflict: ConflictZone;
+  onPress: (conflict: ConflictZone) => void;
+}>(({ conflict, onPress }) => (
+  <Marker
+    coordinate={{
+      latitude: conflict.latitude,
+      longitude: conflict.longitude,
+    }}
+    onPress={() => onPress(conflict)}
+  >
+    <ConflictMarker conflict={conflict} />
+  </Marker>
+));
+ConflictMarkerComponent.displayName = 'ConflictMarkerComponent';
+
+const NeedMarkerComponent = React.memo<{
+  need: UserNeed;
+  onPress: (need: UserNeed) => void;
+  theme: any;
+}>(({ need, onPress, theme }) => (
+  <Marker
+    coordinate={{
+      latitude: need.location.latitude,
+      longitude: need.location.longitude,
+    }}
+    onPress={() => onPress(need)}
+  >
+    <NeedMarker need={need} />
+    <Callout tooltip>
+      <View style={[styles.needCallout, { backgroundColor: theme.colors.surface }]}>
+        <Text style={[styles.needTitle, { color: theme.colors.text }]}>
+          {need.title}
+        </Text>
+        <Text style={[styles.needCategory, { color: theme.colors.textSecondary }]}>
+          {need.category} • {need.priority}
+        </Text>
+        <Text style={[styles.needDescription, { color: theme.colors.textSecondary }]} numberOfLines={2}>
+          {need.description}
+        </Text>
+        <Text style={[styles.needQuantity, { color: theme.colors.primary }]}>
+          {need.quantity} {need.unit || 'units'}
+        </Text>
+      </View>
+    </Callout>
+  </Marker>
+));
+NeedMarkerComponent.displayName = 'NeedMarkerComponent';
 
 const styles = StyleSheet.create({
   container: {

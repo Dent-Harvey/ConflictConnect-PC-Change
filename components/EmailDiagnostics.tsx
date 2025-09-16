@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert, ScrollView, StyleSheet } from 'react-native';
-import { TextInput } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { checkEmailServiceHealth, sendVerificationEmail, generateVerificationCode } from '@/services/backendEmailService';
+import { checkEmailServiceHealth, generateVerificationCode } from '@/services/backendEmailService';
+import { sendVerificationEmail } from '@/services/emailService';
+import React, { useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export const EmailDiagnostics: React.FC = () => {
   const theme = useTheme();
@@ -174,7 +174,7 @@ export const EmailDiagnostics: React.FC = () => {
         <ScrollView 
           style={[styles.resultsContainer, { 
             backgroundColor: theme.colors.surface,
-            borderColor: theme.colors.border 
+            borderColor: theme.colors.border
           }]}
           showsVerticalScrollIndicator={true}
         >

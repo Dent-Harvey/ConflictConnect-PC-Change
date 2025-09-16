@@ -1,35 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  StatusBar,
-  SafeAreaView,
-  Text,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming,
-  withRepeat,
-  Easing,
-  interpolate 
-} from 'react-native-reanimated';
-import { Stack, useRouter } from 'expo-router';
+import { AddConflictModal } from '@/components/AddConflictModal';
 import { ConflictMap } from '@/components/ConflictMap';
 import { OperationsHeader } from '@/components/OperationsHeader';
-import { AddConflictModal } from '@/components/AddConflictModal';
 import { RoleSelectionScreen } from '@/components/RoleSelectionScreen';
+import { AuthenticationFlow } from '@/components/AuthenticationFlow';
+import { PressableScale } from '@/components/ui/PressableScale';
+import { useFirebaseAuth } from '@/contexts/FirebaseAuthContext';
 import { useConflictZones, useLatestConflictData } from '@/hooks/useConflictData';
 import { useSubmitConflict } from '@/hooks/useConflictSubmission';
-import { ConflictZone } from '@/types/conflict';
+import { usePermissions } from '@/hooks/usePermissions';
 import { useTheme } from '@/hooks/useTheme';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useAuth } from '@/contexts/AuthContext';
-import { usePermissions } from '@/hooks/usePermissions';
+import { ConflictZone } from '@/types/conflict';
 import * as Haptics from 'expo-haptics';
-import { PressableScale } from '@/components/ui/PressableScale';
+import { Stack, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import {
+    Alert,
+    SafeAreaView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    View
+} from 'react-native';
+import Animated, {
+    Easing,
+    interpolate,
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withTiming
+} from 'react-native-reanimated';
 
 type ConflictFilter = 'all' | 'critical' | 'verified' | 'active';
 
@@ -37,7 +37,7 @@ export default function Index() {
   const theme = useTheme();
   const { t } = useTranslation();
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading, user, logout } = useAuth();
+  const { user, isLoading: authLoading, needsProfileSetup, logout } = useFirebaseAuth();
   const permissions = usePermissions();
   const [filters, setFilters] = useState(undefined);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
@@ -89,7 +89,7 @@ export default function Index() {
       -1,
       true
     );
-  }, []);
+  }, [gridOverlay, screenGlow]);
   
   // Update timestamp when data changes
   useEffect(() => {
@@ -231,9 +231,9 @@ export default function Index() {
     }
   };
 
-  // Show authentication screen if not authenticated
-  if (!isAuthenticated && !authLoading) {
-    return <RoleSelectionScreen />;
+  // Show authentication flow if not authenticated or needs profile setup
+  if ((!user || needsProfileSetup) && !authLoading) {
+    return <AuthenticationFlow />;
   }
 
   // Show loading screen while checking authentication
@@ -309,7 +309,7 @@ export default function Index() {
               )}
               
               {permissions.canViewResources && (
-                <PressableScale onPress={() => router.push('/(tabs)/resources')}>
+                <PressableScale onPress={() => router.push('/app/resources')}>
                   <View style={[styles.headerButton, { backgroundColor: theme.colors.success, borderColor: theme.colors.success }]}>
                     <Text style={[styles.headerButtonText, { color: '#FFFFFF' }]}>
                       📦
@@ -319,7 +319,7 @@ export default function Index() {
               )}
               
               {permissions.canViewNeeds && (
-                <PressableScale onPress={() => router.push('/(tabs)/needs')}>
+                <PressableScale onPress={() => router.push('/app/needs')}>
                   <View style={[styles.headerButton, { backgroundColor: theme.colors.warning, borderColor: theme.colors.warning }]}>
                     <Text style={[styles.headerButtonText, { color: '#FFFFFF' }]}>
                       🆘

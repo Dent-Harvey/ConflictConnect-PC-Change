@@ -1,0 +1,30 @@
+{
+  "notFound": {
+    "title": "Ups!",
+    "message": "Tato obrazovka neexistuje.",
+    "goHome": "Jít na domovskou obrazovku!"
+  },
+  "needs": {
+    "suggestedTitle": "💡 Navržené potřeby",
+    "suggestedSubtitle": "Na základě charakteristik {zoneName} jsou zde některé zásoby, které by mohly být užitečné:",
+    "addSuggestion": "+ Přidat tuto potřebu",
+    "emptyTitle": "Zatím nejsou přidány žádné potřeby",
+    "emptySubtitle": "Přidejte svou první potřebu a začněte se spojovat s dostupnými zdroji v konfliktních zónách.",
+    "myNeeds": "Moje potřeby"
+  },
+  "profile": {
+    "title": "Profil",
+    "firstName": "Křestní jméno",
+    "lastName": "Příjmení",
+    "email": "E-mail",
+    "phoneNumber": "Telefonní číslo",
+    "organization": "Organizace",
+    "jobTitle": "Pracovní pozice",
+    "bio": "Biografie",
+    "languages": "Jazyky",
+    "location": "Poloha",
+    "save": "Uložit",
+    "cancel": "Zrušit",
+    "required": "Povinné"
+  }
+}

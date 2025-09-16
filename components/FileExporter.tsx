@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, Alert, StyleSheet, Platform } from 'react-native';
-import { PressableScale } from '@/components/ui/PressableScale';
 import { DeveloperLoginModal } from '@/components/DeveloperLoginModal';
+import { PressableScale } from '@/components/ui/PressableScale';
 import { useTheme } from '@/hooks/useTheme';
+import { errorHandler } from '@/utils/errorHandler';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import { errorHandler } from '@/utils/errorHandler';
+import React, { useState } from 'react';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 
 interface FileExporterProps {
   onExportComplete?: () => void;
@@ -65,8 +65,8 @@ Generated: ${new Date().toISOString()}
       const timestamp = new Date().toISOString().replace(/[:.]/g, '_').slice(0, -5);
       const projectName = `ConflictConnect_Export_${timestamp}`;
       
-      // Create temporary directory for export in document directory
-      const tempExportDir = FileSystem.documentDirectory + 'export/';
+      // Create temporary directory for export using a relative path
+      const tempExportDir = 'export/';
       await FileSystem.makeDirectoryAsync(tempExportDir, { intermediates: true });
 
       console.log(`[FILE EXPORT] Processing ${Object.keys(sourceFiles).length} source files...`);
