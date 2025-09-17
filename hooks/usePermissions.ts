@@ -1,4 +1,4 @@
-import { useAuth } from '@/contexts/AuthContext';
+import { useFirebaseAuth } from '@/contexts/FirebaseAuthContext';
 import { UserRole } from '@/types/auth';
 
 export interface Permissions {
@@ -14,7 +14,7 @@ export interface Permissions {
 }
 
 export const usePermissions = (): Permissions => {
-  const { user } = useAuth();
+  const { user } = useFirebaseAuth();
 
   if (!user) {
     // No permissions when not authenticated
