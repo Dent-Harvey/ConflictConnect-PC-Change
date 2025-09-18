@@ -1,38 +1,36 @@
-import React, { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  RefreshControl,
-  Alert,
-  TouchableOpacity,
-} from 'react-native';
-import { StyleSheet } from 'react-native';
-import { Stack } from 'expo-router';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { 
-  FadeIn, 
-  FadeOut,
-  SlideInRight,
-  SlideOutLeft,
-  Layout,
-  LinearTransition
-} from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
-import { PressableScale } from '@/components/ui/PressableScale';
 import { AddResourceModal } from '@/components/AddResourceModal';
 import { AdminDashboard } from '@/components/AdminDashboard';
+import { PressableScale } from '@/components/ui/PressableScale';
+import { useFirebaseAuth } from '@/contexts/FirebaseAuthContext';
+import {
+    useAvailableResources,
+    useDeleteResource,
+    useMarkResourceDepleted,
+    useResources,
+    useToggleResourceAvailability
+} from '@/hooks/useResources';
 import { useTheme } from '@/hooks/useTheme';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useAuth } from '@/contexts/AuthContext';
-import { 
-  useResources, 
-  useAvailableResources, 
-  useDeleteResource, 
-  useToggleResourceAvailability,
-  useMarkResourceDepleted
-} from '@/hooks/useResources';
 import { Resource, ResourceData } from '@/services/resourcesService';
+import * as Haptics from 'expo-haptics';
+import { Stack } from 'expo-router';
+import React, { useCallback, useState } from 'react';
+import {
+    Alert,
+    FlatList,
+    RefreshControl,
+    StyleSheet,
+    Text,
+    View
+} from 'react-native';
+import Animated, {
+    FadeIn,
+    FadeOut,
+    LinearTransition,
+    SlideInRight,
+    SlideOutLeft
+} from 'react-native-reanimated';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const CATEGORY_ICONS: Record<ResourceData['category'], string> = {
   food: '🍞',
@@ -289,7 +287,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
 export default function ResourcesScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user } = useFirebaseAuth();
   const insets = useSafeAreaInsets();
   
   const [showAddModal, setShowAddModal] = useState(false);

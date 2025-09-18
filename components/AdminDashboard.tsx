@@ -1,29 +1,25 @@
-import React, { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-} from 'react-native';
-import Animated, { 
-  FadeIn, 
-  FadeOut,
-  SlideInRight,
-  SlideOutLeft,
-  Layout,
-  LinearTransition
-} from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
 import { PressableScale } from '@/components/ui/PressableScale';
-import { useTheme } from '@/hooks/useTheme';
+import { useFirebaseAuth } from '@/contexts/FirebaseAuthContext';
 import { useResources } from '@/hooks/useResources';
+import { useTheme } from '@/hooks/useTheme';
 import { useUserNeeds } from '@/hooks/useUserNeeds';
-import { useAuth } from '@/contexts/AuthContext';
 import { Resource } from '@/services/resourcesService';
 import { UserNeed } from '@/services/userNeedsService';
+import * as Haptics from 'expo-haptics';
+import React, { useCallback, useState } from 'react';
+import {
+    Alert,
+    FlatList,
+    StyleSheet,
+    Text,
+    View
+} from 'react-native';
+import Animated, {
+    FadeIn,
+    LinearTransition,
+    SlideInRight,
+    SlideOutLeft
+} from 'react-native-reanimated';
 
 interface AdminActivityItem {
   id: string;
@@ -454,7 +450,7 @@ const NeedRequestCard: React.FC<NeedRequestCardProps> = ({ need, onViewDetails, 
 
 export const AdminDashboard: React.FC = () => {
   const theme = useTheme();
-  const { user } = useAuth();
+  const { user } = useFirebaseAuth();
   const [activeTab, setActiveTab] = useState<'resources' | 'needs'>('resources');
 
   const { data: resources = [], isLoading: resourcesLoading } = useResources();

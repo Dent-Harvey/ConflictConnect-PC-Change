@@ -1,5 +1,5 @@
 import { PressableScale } from '@/components/ui/PressableScale';
-import { useAuth } from '@/contexts/AuthContext';
+import { useFirebaseAuth } from '@/contexts/FirebaseAuthContext';
 import { useTheme } from '@/hooks/useTheme';
 import { validateVerificationCode } from '@/services/backendEmailService';
 import { errorHandler } from '@/utils/errorHandler';
@@ -36,7 +36,7 @@ export const EmailVerificationScreen: React.FC<EmailVerificationScreenProps> = (
 }) => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  const { sendVerificationCode, verifyEmailCode } = useAuth();
+  const { sendVerificationCode, verifyEmailCode } = useFirebaseAuth();
   
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);

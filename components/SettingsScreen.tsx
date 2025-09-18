@@ -1,4 +1,4 @@
-import { useAuth } from '@/contexts/AuthContext';
+import { useFirebaseAuth } from '@/contexts/FirebaseAuthContext';
 import { useTheme } from '@/hooks/useTheme';
 import { errorHandler } from '@/utils/errorHandler';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,7 +17,7 @@ import { SettingsLanguageSelector } from './SettingsLanguageSelector';
 
 export const SettingsScreen: React.FC = () => {
   const theme = useTheme();
-  const { user, logout } = useAuth();
+  const { user, logout } = useFirebaseAuth();
   const [showLanguageModal, setShowLanguageModal] = useState(false);
 
   const handleLogout = () => {

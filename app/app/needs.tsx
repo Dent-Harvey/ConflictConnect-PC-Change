@@ -1,29 +1,28 @@
-import React, { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  RefreshControl,
-  Alert,
-  TouchableOpacity,
-  Modal,
-} from 'react-native';
-import { router, Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import * as Haptics from 'expo-haptics';
-import Animated, { FadeIn, FadeOut, LinearTransition, withTiming } from 'react-native-reanimated';
-import { PressableScale } from '@/components/ui/PressableScale';
-import { useTheme } from '@/hooks/useTheme';
-import { useUserNeeds, useDeleteNeed, useCreateNeed } from '@/hooks/useUserNeeds';
-import { UserNeed } from '@/services/userNeedsService';
 import { AddNeedModal } from '@/components/AddNeedModal';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useAuth } from '@/contexts/AuthContext';
 import { SuggestedNeedsCard } from '@/components/SuggestedNeedsCard';
-import { useSuggestedNeeds, SuggestedNeed } from '@/hooks/useSuggestedNeeds';
+import { PressableScale } from '@/components/ui/PressableScale';
+import { useFirebaseAuth } from '@/contexts/FirebaseAuthContext';
 import { useConflictZones } from '@/hooks/useConflictData';
+import { SuggestedNeed, useSuggestedNeeds } from '@/hooks/useSuggestedNeeds';
+import { useTheme } from '@/hooks/useTheme';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useCreateNeed, useDeleteNeed, useUserNeeds } from '@/hooks/useUserNeeds';
+import { UserNeed } from '@/services/userNeedsService';
+import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import { Stack, router } from 'expo-router';
+import React, { useCallback, useState } from 'react';
+import {
+    Alert,
+    FlatList,
+    Modal,
+    RefreshControl,
+    StyleSheet,
+    Text,
+    View
+} from 'react-native';
+import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface NeedCardProps {
   need: UserNeed;
@@ -268,7 +267,7 @@ export default function NeedsScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user } = useFirebaseAuth();
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedConflictZone] = useState('default_zone'); // This should come from context or props
 

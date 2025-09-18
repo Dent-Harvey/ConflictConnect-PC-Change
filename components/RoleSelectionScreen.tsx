@@ -1,21 +1,21 @@
+import { PressableScale } from '@/components/ui/PressableScale';
+import { useFirebaseAuth } from '@/contexts/FirebaseAuthContext';
+import { useTheme } from '@/hooks/useTheme';
+import { UserRole } from '@/types/auth';
+import { errorHandler } from '@/utils/errorHandler';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
   Alert,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Keyboard,
+  Text,
+  TextInput,
+  View,
 } from 'react-native';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
-import { PressableScale } from '@/components/ui/PressableScale';
-import { useAuth } from '@/contexts/AuthContext';
-import { UserRole } from '@/types/auth';
-import { useTheme } from '@/hooks/useTheme';
-import { errorHandler } from '@/utils/errorHandler';
 import { EmailVerificationScreen } from './EmailVerificationScreen';
 import { ProfileSetupScreen } from './ProfileSetupScreen';
 
@@ -24,7 +24,7 @@ const AnimatedPressableScale = Animated.createAnimatedComponent(PressableScale);
 export const ConflictController: React.FC = () => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  const { login, user, pendingVerification, resetVerification } = useAuth();
+  const { login, user, pendingVerification, resetVerification } = useFirebaseAuth();
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
