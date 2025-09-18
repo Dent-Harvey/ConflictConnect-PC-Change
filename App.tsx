@@ -1,4 +1,5 @@
 import React from 'react';
+import { View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
@@ -21,16 +22,16 @@ export default function App() {
   // Show loading screen while checking authentication
   if (authLoading) {
     return (
-      <div style={{ 
+      <View style={{ 
         flex: 1, 
         justifyContent: 'center', 
         alignItems: 'center', 
         backgroundColor: theme.colors.background 
       }}>
-        <p style={{ color: theme.colors.text }}>
+        <Text style={{ color: theme.colors.text }}>
           Initializing Conflict Controller...
-        </p>
-      </div>
+        </Text>
+      </View>
     );
   }
 
