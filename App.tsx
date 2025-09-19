@@ -1,12 +1,11 @@
-import React from 'react';
-import { View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { StatusBar } from 'expo-status-bar';
-import { useTheme } from './hooks/useTheme';
-import { useFirebaseAuth } from './contexts/FirebaseAuthContext';
-import { AuthenticationFlow } from './components/AuthenticationFlow';
+import React from 'react';
+import { StatusBar, Text, View } from 'react-native';
 import MainScreen from './app/index';
+import { AuthenticationFlow } from './components/AuthenticationFlow';
+import { useFirebaseAuth } from './contexts/FirebaseAuthContext';
+import { useTheme } from './hooks/useTheme';
 
 const Stack = createStackNavigator();
 
@@ -37,7 +36,7 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <StatusBar style="light" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle="light-content" backgroundColor={theme.colors.background} />
       <Stack.Navigator
         screenOptions={{
           headerShown: false,

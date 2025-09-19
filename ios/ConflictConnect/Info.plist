@@ -57,7 +57,7 @@
     <string>Crisis Connect uses location to verify your identity for OTG and Hand roles, and to provide relevant local resources and conflict information.</string>
     <key>NSUserActivityTypes</key>
     <array>
-      <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
+      <string>$(PRODUCT_BUNDLE_IDENTIFIER).index_route</string>
     </array>
     <key>RCTNewArchEnabled</key>
     <true/>
