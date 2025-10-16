@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { initializeApp } from 'firebase/app';
+<<<<<<< HEAD
 import { connectAuthEmulator, getReactNativePersistence, initializeAuth } from 'firebase/auth';
 import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
 
@@ -12,6 +13,21 @@ const firebaseConfig = {
   messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
   measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
+=======
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
+
+// Firebase configuration - Your actual Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyCPFS3FgmMK3hCcfR3eezKXpzTCejWl6vE",
+  authDomain: "conflictconnect-9e533.firebaseapp.com",
+  projectId: "conflictconnect-9e533",
+  storageBucket: "conflictconnect-9e533.firebasestorage.app",
+  messagingSenderId: "1038056181745",
+  appId: "1:1038056181745:web:3ca03dc4b919ca6d15fe50",
+  measurementId: "G-32SPXWQ1VV"
+>>>>>>> 013af9f (feat: realtime updates, funding fields, build readiness fixes and Heroku config)
 };
 
 // Initialize Firebase
@@ -36,5 +52,10 @@ if (__DEV__) {
   }
 }
 
+<<<<<<< HEAD
 export { auth, db };
 export default app;
+=======
+export { app, auth, db, storage };
+export default app;
+>>>>>>> 013af9f (feat: realtime updates, funding fields, build readiness fixes and Heroku config)

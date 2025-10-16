@@ -27,6 +27,14 @@ export interface UserNeed {
   };
   status: 'open' | 'in_progress' | 'partially_fulfilled' | 'fulfilled' | 'cancelled' | 'expired';
   tags?: string[];
+  // Optional funding request block
+  fundingRequest?: {
+    reason?: string; // human-entered justification
+    amount?: number; // requested amount in minor units or float
+    currency?: string; // ISO 4217 code, e.g., USD, EUR
+    canReceiveVia?: Array<'google_pay' | 'paypal' | 'apple_pay' | 'celo'>;
+    canSendVia?: Array<'google_pay' | 'paypal' | 'apple_pay' | 'celo'>;
+  };
   fulfillmentRequests?: FulfillmentRequest[];
   verificationStatus?: 'unverified' | 'pending' | 'verified' | 'flagged';
   createdAt?: string;

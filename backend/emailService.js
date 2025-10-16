@@ -28,6 +28,10 @@ const SMTP_CONFIG = {
 
 // Create transporter
 const createTransporter = () => {
+<<<<<<< HEAD
+=======
+  // Nodemailer API: createTransport (not createTransporter)
+>>>>>>> 013af9f (feat: realtime updates, funding fields, build readiness fixes and Heroku config)
   return nodemailer.createTransport(SMTP_CONFIG);
 };
 
