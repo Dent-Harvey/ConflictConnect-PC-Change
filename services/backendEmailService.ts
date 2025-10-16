@@ -19,8 +19,9 @@ export interface EmailServiceRequest {
   text: string;
 }
 
-// Backend API base URL - you'll need to replace this with your actual backend server
-const BACKEND_API_BASE = process.env.EXPO_PUBLIC_BACKEND_API_URL || 'https://your-backend-server.com/api';
+// Backend API base URL
+// Using deployed Heroku instance provided by user
+const BACKEND_API_BASE = process.env.EXPO_PUBLIC_BACKEND_API_URL || 'https://crisis-connectv2-email-api-6e60d3cf962a.herokuapp.com/api';
 
 /**
  * Generates a random 6-digit verification code

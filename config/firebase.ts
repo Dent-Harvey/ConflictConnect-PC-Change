@@ -1,17 +1,17 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
-// Firebase configuration - Replace with your actual Firebase config
+// Firebase configuration - Your actual Firebase config
 const firebaseConfig = {
-  apiKey: "your-api-key",
-  authDomain: "conflictconnect-project.firebaseapp.com",
-  projectId: "conflictconnect-project",
-  storageBucket: "conflictconnect-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdefghijklmnop",
-  measurementId: "G-ABCDEFGHIJ"
+  apiKey: "AIzaSyCPFS3FgmMK3hCcfR3eezKXpzTCejWl6vE",
+  authDomain: "conflictconnect-9e533.firebaseapp.com",
+  projectId: "conflictconnect-9e533",
+  storageBucket: "conflictconnect-9e533.firebasestorage.app",
+  messagingSenderId: "1038056181745",
+  appId: "1:1038056181745:web:3ca03dc4b919ca6d15fe50",
+  measurementId: "G-32SPXWQ1VV"
 };
 
 // Initialize Firebase
@@ -33,5 +33,5 @@ if (__DEV__) {
   // connectAuthEmulator(auth, 'http://localhost:9099');
 }
 
-export { auth, db, storage, app };
+export { app, auth, db, storage };
 export default app;

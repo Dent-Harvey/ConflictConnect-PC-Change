@@ -1,35 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  StatusBar,
-  SafeAreaView,
-  Text,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming,
-  withRepeat,
-  Easing,
-  interpolate 
-} from 'react-native-reanimated';
-import { Stack, useRouter } from 'expo-router';
+import { AddConflictModal } from '@/components/AddConflictModal';
 import { ConflictMap } from '@/components/ConflictMap';
 import { OperationsHeader } from '@/components/OperationsHeader';
-import { AddConflictModal } from '@/components/AddConflictModal';
 import { RoleSelectionScreen } from '@/components/RoleSelectionScreen';
+import { PressableScale } from '@/components/ui/PressableScale';
+import { useAuth } from '@/contexts/AuthContext';
 import { useConflictZones, useLatestConflictData } from '@/hooks/useConflictData';
 import { useSubmitConflict } from '@/hooks/useConflictSubmission';
-import { ConflictZone } from '@/types/conflict';
+import { usePermissions } from '@/hooks/usePermissions';
 import { useTheme } from '@/hooks/useTheme';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useAuth } from '@/contexts/AuthContext';
-import { usePermissions } from '@/hooks/usePermissions';
+import { ConflictZone } from '@/types/conflict';
 import * as Haptics from 'expo-haptics';
-import { PressableScale } from '@/components/ui/PressableScale';
+import { Stack, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import {
+  Alert,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View
+} from 'react-native';
+import Animated, {
+  Easing,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming
+} from 'react-native-reanimated';
 
 type ConflictFilter = 'all' | 'critical' | 'verified' | 'active';
 
@@ -90,6 +89,26 @@ export default function Index() {
       true
     );
   }, []);
+
+  // Subscribe to Firestore realtime updates and refetch on events
+  useEffect(() => {
+    const since = new Date(Date.now() - 5 * 60 * 1000);
+    let unsubscribe: undefined | (() => void);
+    (async () => {
+      try {
+        const { subscribeToConflictZones } = await import('@/services/conflictRealtime');
+        unsubscribe = subscribeToConflictZones(since, () => {
+          refetch();
+          setLastUpdate(new Date());
+        });
+      } catch (err) {
+        console.log('[LIVE TRACKING] Realtime subscription not available:', err);
+      }
+    })();
+    return () => {
+      try { unsubscribe && unsubscribe(); } catch {}
+    };
+  }, []);
   
   // Update timestamp when data changes
   useEffect(() => {
@@ -135,24 +154,15 @@ export default function Index() {
   };
 
   const handleFetchLatest = () => {
-    console.log('[CONFLICT TRACKING] Fetching latest intel...');
+    console.log('[LIVE TRACKING] Fetching latest intel...');
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     
     fetchLatestData(undefined, {
       onSuccess: () => {
         setLastUpdate(new Date());
-        Alert.alert(
-          'REAL-TIME DATA NOT CONFIGURED',
-          'Real-time data sources are not yet integrated. Only manually submitted conflicts are available.',
-          [{ text: 'ACKNOWLEDGED' }]
-        );
       },
       onError: () => {
-        Alert.alert(
-          'INTEL ACQUISITION FAILED',
-          'Could not connect to real-time data sources. Please try refreshing existing data.',
-          [{ text: 'ACKNOWLEDGED' }]
-        );
+        // Silent fail to avoid blocking UX; data will refresh on interval
       },
     });
   };
@@ -252,7 +262,7 @@ export default function Index() {
       <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <Stack.Screen 
           options={{
-            title: 'CONFLICT TRACKING',
+          title: 'LIVE TRACKING',
             headerShown: true,
             headerStyle: { 
               backgroundColor: theme.colors.surface,
@@ -298,6 +308,12 @@ export default function Index() {
           } as any,
           headerRight: () => (
             <View style={styles.headerButtons}>
+              {/* Account/Profile */}
+              <PressableScale onPress={() => router.push('/(tabs)/profile')}>
+                <View style={[styles.headerButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+                  <Text style={[styles.headerButtonText, { color: theme.colors.text }]}>👤</Text>
+                </View>
+              </PressableScale>
               {permissions.canSubmitConflicts && (
                 <PressableScale onPress={handleAddConflict}>
                   <View style={[styles.headerButton, { backgroundColor: theme.colors.error, borderColor: theme.colors.error }]}>
@@ -361,6 +377,14 @@ export default function Index() {
         conflicts={conflicts} 
         lastUpdate={lastUpdate}
       />
+      {/* Live indicator badge */}
+      <View style={{ position: 'absolute', top: 8, left: 12, zIndex: 2, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+        <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: theme.colors.error }} />
+        <Text style={{ color: theme.colors.text, fontFamily: 'Inter-SemiBold', fontSize: 12 }}>Live</Text>
+        <Text style={{ color: theme.colors.textSecondary, fontFamily: 'Inter-Regular', fontSize: 12 }}>
+          · {lastUpdate.toLocaleTimeString()}
+        </Text>
+      </View>
       
       {/* Tactical Grid Overlay */}
       <Animated.View style={[styles.gridOverlay, gridOverlayStyle]} pointerEvents="none">

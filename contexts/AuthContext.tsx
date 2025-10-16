@@ -4,11 +4,14 @@ import * as Location from 'expo-location';
 import { User, UserRole, AuthContextType, LocationData, UserProfile } from '@/types/auth';
 import { errorHandler } from '@/utils/errorHandler';
 import { sendVerificationEmail, generateVerificationCode } from '@/services/backendEmailService';
+import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/config/firebase';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AUTH_STORAGE_KEY = '@crisis_compass_auth';
 const LOCATION_STORAGE_KEY = '@crisis_compass_location';
+const USERS_COLLECTION = 'users';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -50,8 +53,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         
         // Create user immediately for conflict controller (no email verification needed)
+        const userId = `user_${Date.now()}`;
         const newUser: User = {
-          id: `user_${Date.now()}`,
+          id: userId,
           email: undefined,
           role,
           location: undefined,
@@ -62,6 +66,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           createdAt: new Date().toISOString(),
         };
 
+        // Save to Firebase
+        try {
+          const userRef = doc(db, USERS_COLLECTION, userId);
+          await setDoc(userRef, {
+            ...newUser,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
+          console.log('[AUTH] Conflict controller saved to Firebase');
+        } catch (firebaseError) {
+          console.error('[AUTH] Firebase save failed:', firebaseError);
+        }
+
         await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(newUser));
         setUser(newUser);
         return;
@@ -69,8 +86,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Handle scanner role (no email verification needed)
       if (role === 'scanner') {
+        const userId = `user_${Date.now()}`;
         const newUser: User = {
-          id: `user_${Date.now()}`,
+          id: userId,
           email: undefined,
           role,
           location: undefined,
@@ -80,6 +98,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           hasCompletedProfile: true, // Not required for scanner
           createdAt: new Date().toISOString(),
         };
+
+        // Save to Firebase
+        try {
+          const userRef = doc(db, USERS_COLLECTION, userId);
+          await setDoc(userRef, {
+            ...newUser,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
+          console.log('[AUTH] Scanner user saved to Firebase');
+        } catch (firebaseError) {
+          console.error('[AUTH] Firebase save failed:', firebaseError);
+        }
 
         await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(newUser));
         setUser(newUser);
@@ -159,8 +190,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       // Create user after successful email verification
+      const userId = `user_${Date.now()}`;
       const newUser: User = {
-        id: `user_${Date.now()}`,
+        id: userId,
         email: pendingVerification.email,
         role: pendingVerification.role,
         location: undefined,
@@ -205,6 +237,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         newUser.isLocationVerified = true;
       }
 
+      // Save user to Firebase Firestore
+      try {
+        const userRef = doc(db, USERS_COLLECTION, userId);
+        await setDoc(userRef, {
+          ...newUser,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+        console.log('[AUTH] User saved to Firebase Firestore');
+      } catch (firebaseError) {
+        console.error('[AUTH] Firebase save failed, continuing with local storage:', firebaseError);
+        // Continue even if Firebase fails - user is still saved locally
+      }
+
+      // Also save locally for offline support
       await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(newUser));
       setUser(newUser);
       setPendingVerification(null);
@@ -232,6 +279,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         hasCompletedProfile: true,
       };
 
+      // Update in Firebase Firestore
+      try {
+        const userRef = doc(db, USERS_COLLECTION, user.id);
+        await updateDoc(userRef, {
+          profile,
+          hasCompletedProfile: true,
+          updatedAt: serverTimestamp(),
+        });
+        console.log('[AUTH] Profile updated in Firebase Firestore');
+      } catch (firebaseError) {
+        console.error('[AUTH] Firebase update failed, continuing with local storage:', firebaseError);
+        // Continue even if Firebase fails
+      }
+
+      // Also update locally
       await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updatedUser));
       setUser(updatedUser);
       
@@ -257,6 +319,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         hasCompletedProfile: true, // Mark as completed even though skipped
       };
 
+      // Update in Firebase Firestore
+      try {
+        const userRef = doc(db, USERS_COLLECTION, user.id);
+        await updateDoc(userRef, {
+          hasCompletedProfile: true,
+          updatedAt: serverTimestamp(),
+        });
+        console.log('[AUTH] Profile skip updated in Firebase Firestore');
+      } catch (firebaseError) {
+        console.error('[AUTH] Firebase update failed, continuing with local storage:', firebaseError);
+      }
+
+      // Also update locally
       await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updatedUser));
       setUser(updatedUser);
       

@@ -15,9 +15,10 @@ export const useConflictZones = (filters?: ConflictFilters) => {
   return useQuery({
     queryKey: CONFLICT_QUERY_KEYS.list(filters),
     queryFn: () => ConflictService.getConflictZones(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes - shorter for fresher data
+    staleTime: 60 * 1000, // 1 minute for fresher data
     gcTime: 15 * 60 * 1000, // 15 minutes - longer garbage collection
-    refetchInterval: 3 * 60 * 1000, // Refetch every 3 minutes
+    refetchInterval: 60 * 1000, // Refetch every 60 seconds for live feel
+    refetchIntervalInBackground: true,
     refetchOnMount: 'always', // Always get fresh data
     refetchOnWindowFocus: false, // Don't refetch on window focus
     refetchOnReconnect: true, // Refetch on network reconnect

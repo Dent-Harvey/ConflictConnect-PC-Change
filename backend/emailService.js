@@ -28,7 +28,8 @@ const SMTP_CONFIG = {
 
 // Create transporter
 const createTransporter = () => {
-  return nodemailer.createTransporter(SMTP_CONFIG);
+  // Nodemailer API: createTransport (not createTransporter)
+  return nodemailer.createTransport(SMTP_CONFIG);
 };
 
 // Routes

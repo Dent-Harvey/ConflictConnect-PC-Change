@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "ConflictConnect",
+    "name": "Conflict\\Connect",
     "slug": "conflictconnect",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -20,7 +20,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#FFE8D6"
       },
       "package": "com.conflictconnect.app",
       "permissions": [
@@ -64,6 +64,7 @@
     },
     "extra": {
       "router": {},
+      "tagline": "Conflict Connect: Mutual Aid & Resource Matching",
       "eas": {
         "projectId": "67622a4f-e756-42ee-bef7-4e7ae334289f"
       }

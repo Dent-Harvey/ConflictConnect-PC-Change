@@ -1,26 +1,25 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  KeyboardAvoidingView,
-  ScrollView,
-  Platform,
-  Alert,
-  Keyboard,
-} from 'react-native';
-import { router } from 'expo-router';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import * as Haptics from 'expo-haptics';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated';
 import { PressableScale } from '@/components/ui/PressableScale';
 import { useTheme } from '@/hooks/useTheme';
 import { useCreateNeed } from '@/hooks/useUserNeeds';
 import { UserNeed } from '@/services/userNeedsService';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as Haptics from 'expo-haptics';
+import React, { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import {
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { z } from 'zod';
 
 const needSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
@@ -37,6 +36,15 @@ const needSchema = z.object({
   contactEmail: z.string().email('Invalid email format').optional().or(z.literal('')),
   preferredContact: z.string().optional(),
   tags: z.string().optional(),
+  // Funding block (optional for now)
+  fundingReason: z.string().max(500, 'Reason must be less than 500 characters').optional(),
+  fundingAmount: z
+    .number({ invalid_type_error: 'Enter a valid amount' })
+    .positive('Amount must be positive')
+    .optional(),
+  fundingCurrency: z.string().optional(),
+  fundingReceiveVia: z.array(z.enum(['google_pay', 'paypal', 'apple_pay', 'celo'])).optional(),
+  fundingSendVia: z.array(z.enum(['google_pay', 'paypal', 'apple_pay', 'celo'])).optional(),
 });
 
 type NeedFormData = z.infer<typeof needSchema>;
@@ -101,6 +109,8 @@ export const AddNeedModal: React.FC<AddNeedModalProps> = ({
       priority: 'medium',
       urgency: 'within_days',
       quantity: 1,
+      fundingReceiveVia: ['google_pay', 'paypal'],
+      fundingSendVia: ['google_pay', 'paypal'],
     },
   });
 
@@ -133,6 +143,15 @@ export const AddNeedModal: React.FC<AddNeedModalProps> = ({
           preferredContact: data.preferredContact,
         },
         tags: data.tags ? data.tags.split(',').map(tag => tag.trim()) : [],
+        fundingRequest: data.fundingAmount || data.fundingReason || (data.fundingReceiveVia && data.fundingReceiveVia.length > 0)
+          ? {
+              reason: data.fundingReason || undefined,
+              amount: data.fundingAmount || undefined,
+              currency: data.fundingCurrency || undefined,
+              canReceiveVia: data.fundingReceiveVia || undefined,
+              canSendVia: data.fundingSendVia || undefined,
+            }
+          : undefined,
       };
 
       await createNeedMutation.mutateAsync(needData);
@@ -416,6 +435,131 @@ export const AddNeedModal: React.FC<AddNeedModalProps> = ({
             </View>
           </View>
 
+      {/* Funding Support (optional now, backend later) */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Funding Support (Optional)</Text>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Reason for Funding</Text>
+          <Controller
+            control={control}
+            name="fundingReason"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                style={[styles.textInput, styles.textArea]}
+                value={value || ''}
+                onChangeText={onChange}
+                placeholder="Explain why funding is needed and how it will be used"
+                placeholderTextColor={theme.colors.textSecondary}
+                multiline
+              />
+            )}
+          />
+        </View>
+
+        <View style={[styles.inputGroup, { flexDirection: 'row', gap: theme.spacing.md }]}> 
+          <View style={{ flex: 1 }}>
+            <Text style={styles.label}>Amount</Text>
+            <Controller
+              control={control}
+              name="fundingAmount"
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  style={styles.textInput}
+                  value={value?.toString() || ''}
+                  onChangeText={(text) => onChange(parseFloat(text) || undefined)}
+                  placeholder="100"
+                  placeholderTextColor={theme.colors.textSecondary}
+                  keyboardType="numeric"
+                />
+              )}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.label}>Currency</Text>
+            <Controller
+              control={control}
+              name="fundingCurrency"
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  style={styles.textInput}
+                  value={value || ''}
+                  onChangeText={onChange}
+                  placeholder="Auto (e.g. USD, EUR, local)"
+                  placeholderTextColor={theme.colors.textSecondary}
+                  autoCapitalize="characters"
+                />
+              )}
+            />
+          </View>
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Can Receive Via</Text>
+          <Controller
+            control={control}
+            name="fundingReceiveVia"
+            render={({ field: { onChange, value } }) => (
+              <View style={styles.pickerRow}>
+                {['google_pay','paypal','apple_pay','celo'].map((opt) => (
+                  <PressableScale
+                    key={opt}
+                    style={[
+                      styles.pickerOption,
+                      Array.isArray(value) && value.includes(opt as any) && styles.pickerOptionSelected,
+                    ]}
+                    onPress={() => {
+                      const current = new Set(value || []);
+                      current.has(opt as any) ? current.delete(opt as any) : current.add(opt as any);
+                      onChange(Array.from(current));
+                    }}
+                  >
+                    <Text style={[
+                      styles.pickerOptionText,
+                      Array.isArray(value) && value.includes(opt as any) && styles.pickerOptionTextSelected,
+                    ]}>
+                      {opt.replace('_',' ').toUpperCase()}
+                    </Text>
+                  </PressableScale>
+                ))}
+              </View>
+            )}
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Can Send Via</Text>
+          <Controller
+            control={control}
+            name="fundingSendVia"
+            render={({ field: { onChange, value } }) => (
+              <View style={styles.pickerRow}>
+                {['google_pay','paypal','apple_pay','celo'].map((opt) => (
+                  <PressableScale
+                    key={opt}
+                    style={[
+                      styles.pickerOption,
+                      Array.isArray(value) && value.includes(opt as any) && styles.pickerOptionSelected,
+                    ]}
+                    onPress={() => {
+                      const current = new Set(value || []);
+                      current.has(opt as any) ? current.delete(opt as any) : current.add(opt as any);
+                      onChange(Array.from(current));
+                    }}
+                  >
+                    <Text style={[
+                      styles.pickerOptionText,
+                      Array.isArray(value) && value.includes(opt as any) && styles.pickerOptionTextSelected,
+                    ]}>
+                      {opt.replace('_',' ').toUpperCase()}
+                    </Text>
+                  </PressableScale>
+                ))}
+              </View>
+            )}
+          />
+        </View>
+      </View>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Priority & Urgency</Text>
             
