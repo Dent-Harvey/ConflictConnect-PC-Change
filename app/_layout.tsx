@@ -4,14 +4,14 @@ import { ErrorBoundaryProps, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { View, Text } from 'react-native';
+import { Text, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { FirebaseAuthProvider } from '@/contexts/FirebaseAuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { errorHandler } from '@/utils/errorHandler';
 import { useEffect } from 'react';
-import { FirebaseAuthProvider } from '@/contexts/FirebaseAuthContext';
 
 // Create a client
 const queryClient = new QueryClient({

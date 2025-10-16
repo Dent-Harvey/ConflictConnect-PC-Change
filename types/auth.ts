@@ -1,4 +1,4 @@
-export type UserRole = 'scanner' | 'otg' | 'hand' | 'conflict_controller';
+export type UserRole = 'civilian' | 'scanner' | 'otg' | 'hand' | 'conflict_controller';
 
 export interface UserProfile {
     // Required fields
@@ -61,18 +61,12 @@ export interface UserProfile {
 
 export interface User {
   id: string;
-  email?: string;
+  email: string;
   role: UserRole;
-  location?: {
-    latitude: number;
-    longitude: number;
-    address?: string;
-  };
-  isLocationVerified: boolean;
-  isEmailVerified: boolean;
   profile?: UserProfile;
-  hasCompletedProfile: boolean;
-  createdAt: string;
+  verified: boolean;
+  createdAt: Date;
+  lastActive: Date;
 }
 
 export interface AuthContextType {

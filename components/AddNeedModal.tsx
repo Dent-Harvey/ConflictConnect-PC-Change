@@ -39,7 +39,7 @@ const needSchema = z.object({
   // Funding block (optional for now)
   fundingReason: z.string().max(500, 'Reason must be less than 500 characters').optional(),
   fundingAmount: z
-    .number({ invalid_type_error: 'Enter a valid amount' })
+    .number()
     .positive('Amount must be positive')
     .optional(),
   fundingCurrency: z.string().optional(),

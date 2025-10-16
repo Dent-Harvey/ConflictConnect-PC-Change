@@ -1,29 +1,28 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { 
-  User as FirebaseUser,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  sendEmailVerification,
-  updateProfile
-} from 'firebase/auth';
-import { 
-  doc, 
-  setDoc, 
-  getDoc, 
-  updateDoc, 
-  collection, 
-  query, 
-  where, 
-  getDocs,
-  serverTimestamp
-} from 'firebase/firestore';
 import { auth, db } from '@/config/firebase';
-import { User, UserRole, AuthContextType, UserProfile } from '@/types/auth';
+import { generateVerificationCode, sendVerificationEmail } from '@/services/backendEmailService';
+import { AuthContextType, User, UserProfile, UserRole } from '@/types/auth';
 import { errorHandler } from '@/utils/errorHandler';
-import { sendVerificationEmail, generateVerificationCode } from '@/services/backendEmailService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+    User as FirebaseUser,
+    createUserWithEmailAndPassword,
+    onAuthStateChanged,
+    sendEmailVerification,
+    signOut,
+    updateProfile
+} from 'firebase/auth';
+import {
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    query,
+    serverTimestamp,
+    setDoc,
+    updateDoc,
+    where
+} from 'firebase/firestore';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 const FirebaseAuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -75,7 +74,7 @@ export const FirebaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
           const user: User = {
             id: firebaseUser.uid,
             email: firebaseUser.email || '',
-            role: userData.role || 'civilian',
+            role: 'civilian', // Default role for now
             profile: userData,
             verified: firebaseUser.emailVerified,
             createdAt: userData.createdAt?.toDate() || new Date(),
@@ -91,7 +90,7 @@ export const FirebaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
           setUser({
             id: firebaseUser.uid,
             email: firebaseUser.email || '',
-            role: userData.role || 'civilian',
+            role: 'civilian',
             verified: firebaseUser.emailVerified,
             createdAt: userData.createdAt?.toDate() || new Date(),
             lastActive: new Date()

@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "Conflict Connect",
+    "slug": "conflict-connect",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/conflict-connect-logo.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/conflict-connect-logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFE8D6"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.conflictconnect.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "jsEngine": "hermes"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/conflict-connect-logo.png",
+        "backgroundColor": "#FFE8D6"
+      },
+      "package": "com.conflictconnect.app"
+    },
+    "web": {
+      "favicon": "./assets/images/conflict-connect-logo.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-location",
+      "expo-image-picker",
+      "expo-document-picker",
+      "expo-localization"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "your-project-id-here"
+      },
+      "tagline": "Conflict Connect: Mutual Aid & Resource Matching"
+    }
+  }
+}
