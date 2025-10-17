@@ -8,7 +8,17 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "buildConfiguration": "Release"
+      }
+    },
+    "standalone": {
+      "distribution": "internal",
+      "developmentClient": false,
+      "ios": {
+        "buildConfiguration": "Release"
+      }
     },
     "production": {
       "ios": {

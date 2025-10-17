@@ -6,19 +6,34 @@ import { EnhancedProfileSetup } from './EnhancedProfileSetup';
 
 export const ProfileSetupScreen: React.FC = () => {
   const theme = useTheme();
-  const { updateProfile, skipProfile, user, completeProfileSetup } = useFirebaseAuth();
+  const { user, completeProfileSetup } = useFirebaseAuth();
 
   const handleComplete = async (profile: any) => {
     if (completeProfileSetup) {
       await completeProfileSetup(profile);
-    } else if (updateProfile) {
-      await updateProfile(profile);
     }
   };
 
   const handleSkip = async () => {
-    if (skipProfile) {
-      await skipProfile();
+    // Skip profile setup by completing with minimal required data
+    if (completeProfileSetup) {
+      await completeProfileSetup({
+        firstName: 'User',
+        lastName: 'Name',
+        email: user?.email || '',
+        location: {
+          latitude: 0,
+          longitude: 0,
+          address: 'Not provided',
+          city: '',
+          country: ''
+        },
+        languages: ['en'],
+        preferredLanguage: 'en',
+        showLocation: false,
+        showContactInfo: false,
+        allowMessaging: false
+      });
     }
   };
 

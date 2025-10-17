@@ -1,5 +1,5 @@
 import { auth, db } from '@/config/firebase';
-import { generateVerificationCode, sendVerificationEmail } from '@/services/backendEmailService';
+import { generateVerificationCode, sendVerificationEmail } from '@/services/firebaseEmailService';
 import { AuthContextType, User, UserProfile, UserRole } from '@/types/auth';
 import { errorHandler } from '@/utils/errorHandler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -121,6 +121,23 @@ export const FirebaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const login = async (role: UserRole, email?: string, password?: string) => {
     try {
       setIsLoading(true);
+
+      // Handle scanner (guest) authentication
+      if (role === 'scanner') {
+        const tempUser: User = {
+          id: 'scanner_' + Date.now(),
+          email: 'guest@conflictconnect.app',
+          role: 'scanner',
+          verified: false,
+          createdAt: new Date(),
+          lastActive: new Date()
+        };
+
+        setUser(tempUser);
+        await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(tempUser));
+        setIsLoading(false);
+        return tempUser;
+      }
 
       // Handle conflict controller authentication
       if (role === 'conflict_controller') {

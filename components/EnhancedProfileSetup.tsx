@@ -114,7 +114,8 @@ export const EnhancedProfileSetup: React.FC<EnhancedProfileSetupProps> = ({
     setIsLoading(true);
     try {
       // Ensure all required fields are present
-      if (!profile.firstName || !profile.lastName || !profile.email || !profile.location) {
+      if (!profile.firstName || !profile.lastName || !profile.email || 
+          !profile.location || !profile.location.address) {
         throw new Error('Missing required fields');
       }
 

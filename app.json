@@ -27,7 +27,12 @@
         "foregroundImage": "./assets/images/conflict-connect-logo.png",
         "backgroundColor": "#FFE8D6"
       },
-      "package": "com.conflictconnect.app"
+      "package": "com.conflictconnect.app",
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/images/conflict-connect-logo.png",
@@ -38,7 +43,8 @@
       "expo-location",
       "expo-image-picker",
       "expo-document-picker",
-      "expo-localization"
+      "expo-localization",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
@@ -47,10 +53,11 @@
       "router": {
         "origin": false
       },
+      "tagline": "Conflict Connect: Mutual Aid & Resource Matching",
       "eas": {
-        "projectId": "your-project-id-here"
-      },
-      "tagline": "Conflict Connect: Mutual Aid & Resource Matching"
-    }
+        "projectId": "e9d7f471-fc50-48d9-8802-868a287ab658"
+      }
+    },
+    "owner": "samcat"
   }
 }

@@ -43,6 +43,7 @@ export default function Index() {
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [showAddConflictModal, setShowAddConflictModal] = useState(false);
   const [activeFilter, setActiveFilter] = useState<ConflictFilter>('all');
+  const [showSplash, setShowSplash] = useState(true);
   
   // Animation values for cinematic effects
   const gridOverlay = useSharedValue(0);
@@ -97,6 +98,17 @@ export default function Index() {
       setLastUpdate(new Date());
     }
   }, [conflicts]);
+
+  // Splash screen timer
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!authLoading) {
+        setShowSplash(false);
+      }
+    }, 2000); // Show splash for minimum 2 seconds
+    
+    return () => clearTimeout(timer);
+  }, [authLoading]);
 
   // Animated styles - Must be declared before any early returns
   const gridOverlayStyle = useAnimatedStyle(() => {
@@ -231,20 +243,38 @@ export default function Index() {
     }
   };
 
-  // Show authentication flow if not authenticated or needs profile setup
-  if ((!user || needsProfileSetup) && !authLoading) {
-    return <AuthenticationFlow />;
-  }
-
-  // Show loading screen while checking authentication
-  if (authLoading) {
+  // Show branded splash screen on app launch
+  if (showSplash || authLoading) {
     return (
-      <View style={[styles.container, { backgroundColor: theme.colors.background, justifyContent: 'center', alignItems: 'center' }]}>
-        <Text style={[styles.loadingText, { color: theme.colors.text }]}>
-          Initializing Conflict Controller...
+      <View style={[styles.container, { 
+        backgroundColor: theme.colors.background, 
+        justifyContent: 'center', 
+        alignItems: 'center' 
+      }]}>
+        <Text style={[styles.loadingText, { 
+          color: theme.colors.primary,
+          fontSize: 32,
+          fontFamily: 'Inter-Bold',
+          marginBottom: 20,
+          letterSpacing: 2
+        }]}>
+          CONFLICT CONNECT
+        </Text>
+        <Text style={[styles.loadingText, { 
+          color: theme.colors.text,
+          fontSize: 16,
+          fontFamily: 'Inter-Regular',
+          opacity: 0.7
+        }]}>
+          Initializing Systems...
         </Text>
       </View>
     );
+  }
+
+  // Show authentication flow if not authenticated or needs profile setup
+  if ((!user || needsProfileSetup) && !authLoading) {
+    return <AuthenticationFlow />;
   }
 
   if (error) {

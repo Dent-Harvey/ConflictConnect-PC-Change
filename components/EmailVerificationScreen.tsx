@@ -1,7 +1,7 @@
 import { PressableScale } from '@/components/ui/PressableScale';
 import { useFirebaseAuth } from '@/contexts/FirebaseAuthContext';
 import { useTheme } from '@/hooks/useTheme';
-import { validateVerificationCode } from '@/services/backendEmailService';
+import { validateVerificationCode } from '@/services/firebaseEmailService';
 import { errorHandler } from '@/utils/errorHandler';
 import * as Haptics from 'expo-haptics';
 import React, { useEffect, useRef, useState } from 'react';

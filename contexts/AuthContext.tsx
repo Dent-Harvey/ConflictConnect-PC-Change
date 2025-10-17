@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import { User, UserRole, AuthContextType, LocationData, UserProfile } from '@/types/auth';
 import { errorHandler } from '@/utils/errorHandler';
-import { sendVerificationEmail, generateVerificationCode } from '@/services/backendEmailService';
+import { sendVerificationEmail, generateVerificationCode } from '@/services/firebaseEmailService';
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 

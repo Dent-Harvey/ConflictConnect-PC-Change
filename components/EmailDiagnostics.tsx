@@ -1,6 +1,5 @@
 import { useTheme } from '@/hooks/useTheme';
-import { checkEmailServiceHealth, generateVerificationCode } from '@/services/backendEmailService';
-import { sendVerificationEmail } from '@/services/emailService';
+import { checkEmailServiceHealth, generateVerificationCode, sendVerificationEmail } from '@/services/firebaseEmailService';
 import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
