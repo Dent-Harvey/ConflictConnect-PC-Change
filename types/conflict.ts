@@ -8,6 +8,8 @@ export interface ConflictSource {
   type: SourceType;
   url: string;
   credibility: number; // 0-10 scale
+  title?: string;
+  publishedAt?: string;
 }
 
 export interface RelatedCharity {

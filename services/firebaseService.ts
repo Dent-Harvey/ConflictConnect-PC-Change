@@ -46,7 +46,7 @@ export class FirebaseUserService {
         isLocationVerified: false,
         isEmailVerified: false,
         hasCompletedProfile: false,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
       };
 
       // Save to Firestore

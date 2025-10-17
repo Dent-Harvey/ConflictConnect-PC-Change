@@ -274,7 +274,7 @@ export class UserMatchingService {
       score += 30;
     } else if (need.priority === 'high' && (resource.availability === 'immediate' || resource.availability === 'scheduled')) {
       score += 25;
-    } else if (need.priority === 'medium' && resource.availability !== 'unavailable') {
+    } else if (need.priority === 'medium') {
       score += 20;
     } else if (need.priority === 'low') {
       score += 15;

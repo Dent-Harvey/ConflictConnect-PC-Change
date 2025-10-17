@@ -2,10 +2,13 @@ export type UserRole = 'civilian' | 'scanner' | 'otg' | 'hand' | 'conflict_contr
 
 export interface UserProfile {
     // Required fields
-  firstName: string;
-  lastName: string;
-  email: string;
-  location: {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  role?: UserRole;
+  id?: string;
+  createdAt?: Date | string;
+  location?: {
     latitude: number;
     longitude: number;
     address: string;
@@ -61,12 +64,24 @@ export interface UserProfile {
 
 export interface User {
   id: string;
-  email: string;
+  email?: string;
   role: UserRole;
   profile?: UserProfile;
-  verified: boolean;
-  createdAt: Date;
-  lastActive: Date;
+  verified?: boolean;
+  isEmailVerified?: boolean;
+  createdAt: Date | string;
+  lastActive?: Date | string;
+  hasCompletedProfile?: boolean;
+  location?: {
+    latitude: number;
+    longitude: number;
+    address?: string;
+    city?: string;
+    country?: string;
+    accuracy?: number;
+    timestamp?: string;
+  };
+  isLocationVerified?: boolean;
 }
 
 export interface AuthContextType {
@@ -75,10 +90,10 @@ export interface AuthContextType {
   isLoading: boolean;
   pendingVerification: { email: string; role: UserRole } | null;
   needsProfileSetup: boolean;
-  login: (role: UserRole, email?: string, password?: string) => Promise<User | { email: string; verificationCode: string }>;
+  login: (role: UserRole, email?: string, password?: string) => Promise<void | User | { email: string; verificationCode: string }>;
   verifyEmailAndCreateUser: (email: string, code: string, role?: UserRole) => Promise<any>;
-  completeProfileSetup: (profileData: UserProfile) => Promise<User>;
-  updateUserProfile: (updates: Partial<UserProfile>) => Promise<User>;
+  completeProfileSetup: (profileData: UserProfile) => Promise<User | any>;
+  updateUserProfile: (updates: Partial<UserProfile>) => Promise<User | any>;
   logout: () => Promise<void>;
   updateLocation: (location: { latitude: number; longitude: number; address?: string }) => Promise<void>;
   verifyLocation?: () => Promise<boolean>;

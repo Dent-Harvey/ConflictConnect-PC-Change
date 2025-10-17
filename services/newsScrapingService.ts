@@ -407,8 +407,8 @@ export class NewsScrapingService {
 
         // Update severity if news indicates higher severity
         const newsSeverity = this.determineSeverity(article);
-        if (this.isSeverityHigher(newsSeverity, conflict.severity)) {
-          conflict.severity = newsSeverity;
+        if (conflict.severity && this.isSeverityHigher(newsSeverity, conflict.severity)) {
+          conflict.severity = newsSeverity as any;
         }
 
         // Update real-time status

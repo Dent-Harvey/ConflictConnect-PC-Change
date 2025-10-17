@@ -77,7 +77,7 @@ export const FirebaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
             role: 'civilian', // Default role for now
             profile: userData,
             verified: firebaseUser.emailVerified,
-            createdAt: userData.createdAt?.toDate() || new Date(),
+            createdAt: (userData as any).createdAt?.toDate?.() || new Date(),
             lastActive: new Date()
           };
 
@@ -92,7 +92,7 @@ export const FirebaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
             email: firebaseUser.email || '',
             role: 'civilian',
             verified: firebaseUser.emailVerified,
-            createdAt: userData.createdAt?.toDate() || new Date(),
+            createdAt: (userData as any).createdAt?.toDate?.() || new Date(),
             lastActive: new Date()
           });
         }
@@ -180,7 +180,7 @@ export const FirebaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const firebaseUser = userCredential.user;
 
       // Create initial user document in Firestore
-      const initialProfile: Partial<UserProfile> = {
+      const initialProfile: any = {
         role,
         email,
         createdAt: serverTimestamp(),
@@ -233,10 +233,10 @@ export const FirebaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const updatedUser: User = {
         id: firebaseUser.uid,
         email: firebaseUser.email || '',
-        role: profileData.role || 'civilian',
+        role: (profileData as any).role || 'civilian',
         profile: completeProfile as UserProfile,
         verified: firebaseUser.emailVerified,
-        createdAt: profileData.createdAt?.toDate() || new Date(),
+        createdAt: (profileData as any).createdAt?.toDate?.() || new Date(),
         lastActive: new Date()
       };
 
@@ -308,8 +308,9 @@ export const FirebaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const locationData = {
         latitude: location.latitude,
         longitude: location.longitude,
-        accuracy: location.accuracy,
-        timestamp: new Date().toISOString()
+        address: location.address || '',
+        city: location.city || '',
+        country: location.country || ''
       };
 
       await updateUserProfile({ location: locationData });
@@ -321,7 +322,7 @@ export const FirebaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const updateUserRole = async (role: UserRole) => {
     try {
       if (!user) return;
-      await updateUserProfile({ role });
+      await updateUserProfile({ role } as any);
     } catch (error) {
       console.error('Error updating user role:', error);
       throw error;
@@ -388,6 +389,10 @@ export const FirebaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
+  const resetVerification = () => {
+    setPendingVerification(null);
+  };
+
   // Helper function to calculate distance between two points
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371; // Radius of the Earth in kilometers
@@ -415,7 +420,8 @@ export const FirebaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     updateLocation,
     updateUserRole,
     getUsersByRole,
-    getUsersByLocation
+    getUsersByLocation,
+    resetVerification
   };
 
   return (
@@ -432,3 +438,6 @@ export const useFirebaseAuth = () => {
   }
   return context;
 };
+
+// Alias for compatibility
+export const useAuth = useFirebaseAuth;

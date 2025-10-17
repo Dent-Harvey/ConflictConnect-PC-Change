@@ -152,7 +152,7 @@ export default function ProfileScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const { firebaseUser } = useAuth();
+  const { user: authUser } = useAuth();
   
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -198,14 +198,14 @@ export default function ProfileScreen() {
   // Load user data
   useEffect(() => {
     loadUserData();
-  }, [firebaseUser]);
+  }, [authUser]);
 
   const loadUserData = async () => {
-    if (!firebaseUser?.uid) return;
+    if (!authUser?.id) return;
     
     try {
       setLoading(true);
-      const userData = await userService.getUserById(firebaseUser.uid);
+      const userData = await userService.getUserById(authUser.id);
       
       if (userData) {
         setUser(userData);
@@ -289,7 +289,7 @@ export default function ProfileScreen() {
   };
 
   const onSubmit = async (data: ProfileFormData) => {
-    if (!firebaseUser?.uid) return;
+    if (!authUser?.id) return;
 
     try {
       setSaving(true);
@@ -300,7 +300,7 @@ export default function ProfileScreen() {
         profilePicture: profileImage || undefined,
       };
 
-      await userService.updateUser(firebaseUser.uid, updateData);
+      await userService.updateUser(authUser.id, updateData);
       Alert.alert('Success', 'Profile updated successfully');
       loadUserData(); // Reload data
     } catch (error) {

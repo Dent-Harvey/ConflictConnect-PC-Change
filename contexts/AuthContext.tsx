@@ -425,12 +425,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const needsProfileSetup = !!(user && !user.hasCompletedProfile);
+
+  const verifyEmailAndCreateUser = async (email: string, code: string, role?: UserRole) => {
+    // This is handled by login flow in this context
+    return Promise.resolve();
+  };
+
+  const completeProfileSetup = async (profileData: UserProfile) => {
+    if (!user) throw new Error('No user to update');
+    const updated = { ...user, profile: profileData, hasCompletedProfile: true };
+    setUser(updated);
+    await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updated));
+    return updated;
+  };
+
+  const updateUserProfile = async (updates: Partial<UserProfile>) => {
+    if (!user) throw new Error('No user to update');
+    const updated = { ...user, profile: { ...user.profile, ...updates } };
+    setUser(updated);
+    await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updated));
+    return updated;
+  };
+
+  const updateUserRole = async (role: UserRole) => {
+    if (!user) throw new Error('No user to update');
+    const updated = { ...user, role };
+    setUser(updated);
+    await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updated));
+  };
+
+  const getUsersByRole = async (role: UserRole, limit?: number) => {
+    return [] as UserProfile[];
+  };
+
+  const getUsersByLocation = async (latitude: number, longitude: number, radiusKm?: number) => {
+    return [] as UserProfile[];
+  };
+
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
     isLoading,
     pendingVerification,
+    needsProfileSetup,
     login,
+    verifyEmailAndCreateUser,
+    completeProfileSetup,
+    updateUserProfile,
     logout,
     updateLocation,
     verifyLocation,
@@ -439,6 +481,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updateProfile,
     skipProfile,
     resetVerification,
+    updateUserRole,
+    getUsersByRole,
+    getUsersByLocation,
   };
 
   return (

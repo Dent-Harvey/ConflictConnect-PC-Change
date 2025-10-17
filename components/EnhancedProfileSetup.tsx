@@ -22,8 +22,8 @@ import {
 import { LanguageSelector } from './LanguageSelector';
 
 interface EnhancedProfileSetupProps {
-  onComplete: (profile: UserProfile) => void;
-  onSkip: () => void;
+  onComplete: (profile: UserProfile) => void | Promise<void>;
+  onSkip: () => void | Promise<void>;
   initialData?: Partial<UserProfile>;
 }
 

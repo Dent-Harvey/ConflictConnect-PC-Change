@@ -64,6 +64,9 @@ export const EmailVerificationScreen: React.FC<EmailVerificationScreenProps> = (
     try {
       setIsLoading(true);
       console.log('[EMAIL_VERIFICATION] Sending initial verification code');
+      if (!sendVerificationCode) {
+        throw new Error('Verification code function not available');
+      }
       const generatedCode = await sendVerificationCode(email);
       setVerificationCode(generatedCode);
       
@@ -132,6 +135,9 @@ export const EmailVerificationScreen: React.FC<EmailVerificationScreenProps> = (
       setIsLoading(true);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       
+      if (!verifyEmailCode) {
+        throw new Error('Verification function not available');
+      }
       await verifyEmailCode(codeToVerify, verificationCode);
       
       // Success - the AuthContext will handle navigation
@@ -166,6 +172,9 @@ export const EmailVerificationScreen: React.FC<EmailVerificationScreenProps> = (
       setIsResending(true);
       console.log('[EMAIL_VERIFICATION] Resending verification code');
       
+      if (!sendVerificationCode) {
+        throw new Error('Verification code function not available');
+      }
       const newCode = await sendVerificationCode(email);
       setVerificationCode(newCode);
       setTimeLeft(600); // Reset timer
