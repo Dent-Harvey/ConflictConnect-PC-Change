@@ -30,6 +30,8 @@ const AUTH_STORAGE_KEY = '@conflict_connect_auth';
 const PROFILE_STORAGE_KEY = '@conflict_connect_profile';
 
 export const FirebaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  console.log('[AUTH] FirebaseAuthProvider initializing...');
+  
   const [user, setUser] = useState<User | null>(null);
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,21 +40,39 @@ export const FirebaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   // Listen to Firebase auth state changes
   useEffect(() => {
+    console.log('[AUTH] Setting up auth state listener...');
+    
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        setFirebaseUser(firebaseUser);
-        await loadUserProfile(firebaseUser);
-      } else {
-        setFirebaseUser(null);
-        setUser(null);
-        setNeedsProfileSetup(false);
-        await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
-        await AsyncStorage.removeItem(PROFILE_STORAGE_KEY);
+      try {
+        console.log('[AUTH] Auth state changed:', firebaseUser ? 'User logged in' : 'No user');
+        
+        if (firebaseUser) {
+          setFirebaseUser(firebaseUser);
+          await loadUserProfile(firebaseUser);
+        } else {
+          setFirebaseUser(null);
+          setUser(null);
+          setNeedsProfileSetup(false);
+          
+          try {
+            await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
+            await AsyncStorage.removeItem(PROFILE_STORAGE_KEY);
+            console.log('[AUTH] Cleared stored auth data');
+          } catch (storageError) {
+            console.error('[AUTH] Error clearing AsyncStorage:', storageError);
+          }
+        }
+      } catch (error) {
+        console.error('[AUTH] Error in auth state change handler:', error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     });
 
-    return unsubscribe;
+    return () => {
+      console.log('[AUTH] Cleaning up auth listener');
+      unsubscribe();
+    };
   }, []);
 
   const loadUserProfile = async (firebaseUser: FirebaseUser) => {

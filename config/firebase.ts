@@ -4,6 +4,8 @@ import { connectAuthEmulator, getAuth, initializeAuth } from 'firebase/auth';
 import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
+console.log('[FIREBASE] Initializing Firebase...');
+
 // Firebase configuration
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY || "AIzaSyCPFS3FgmMK3hCcfR3eezKXpzTCejWl6vE",
@@ -15,16 +17,26 @@ const firebaseConfig = {
   measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-32SPXWQ1VV"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+let app, auth, db;
 
-// Initialize Auth with AsyncStorage persistence
-// @ts-ignore - Using AsyncStorage directly for React Native
-const auth = initializeAuth(app, {
-  persistence: AsyncStorage as any
-});
+try {
+  // Initialize Firebase
+  app = initializeApp(firebaseConfig);
+  console.log('[FIREBASE] App initialized');
 
-const db = getFirestore(app);
+  // Initialize Auth with AsyncStorage persistence
+  // @ts-ignore - Using AsyncStorage directly for React Native
+  auth = initializeAuth(app, {
+    persistence: AsyncStorage as any
+  });
+  console.log('[FIREBASE] Auth initialized');
+
+  db = getFirestore(app);
+  console.log('[FIREBASE] Firestore initialized');
+} catch (error) {
+  console.error('[FIREBASE] Initialization error:', error);
+  throw error; // Re-throw to make the error visible
+}
 
 // Connect to emulators in development
 if (__DEV__) {

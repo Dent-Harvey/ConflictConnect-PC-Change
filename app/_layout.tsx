@@ -5,13 +5,19 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Text, View } from 'react-native';
+import { Text, View, LogBox } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { FirebaseAuthProvider } from '@/contexts/FirebaseAuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { errorHandler } from '@/utils/errorHandler';
 import { useEffect } from 'react';
+
+// Enable all error logging for debugging
+LogBox.ignoreAllLogs(false);
+
+// Log startup
+console.log('[APP] Starting Conflict Connect...');
 
 // Create a client
 const queryClient = new QueryClient({
@@ -42,7 +48,7 @@ export function ErrorBoundary({ error, }: ErrorBoundaryProps) {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const [loaded, error] = useFonts({
+  const [loaded, fontError] = useFonts({
     "Inter-Regular": require("../assets/fonts/Inter-Regular.ttf"),
     "Inter-Medium": require("../assets/fonts/Inter-Medium.ttf"),
     "Inter-SemiBold": require("../assets/fonts/Inter-SemiBold.ttf"),
@@ -51,8 +57,18 @@ export default function RootLayout() {
     "Inter-Black": require("../assets/fonts/Inter-Black.ttf"),
   });
 
-  if (!loaded && !error) {
+  useEffect(() => {
+    if (fontError) {
+      console.error('[APP] Font loading error:', fontError);
+    }
+    if (loaded) {
+      console.log('[APP] Fonts loaded successfully');
+    }
+  }, [loaded, fontError]);
+
+  if (!loaded && !fontError) {
     // Show loading screen while fonts are loading
+    console.log('[APP] Loading fonts...');
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000000' }}>
         <Text style={{ color: '#FFFFFF', fontSize: 16, fontFamily: 'System' }}>
@@ -60,6 +76,11 @@ export default function RootLayout() {
         </Text>
       </View>
     );
+  }
+
+  // Continue even if fonts fail to load (will use system fonts)
+  if (fontError) {
+    console.warn('[APP] Continuing with system fonts due to error:', fontError);
   }
 
   return (

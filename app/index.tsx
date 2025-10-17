@@ -34,6 +34,8 @@ import Animated, {
 type ConflictFilter = 'all' | 'critical' | 'verified' | 'active';
 
 export default function Index() {
+  console.log('[INDEX] Component mounting...');
+  
   const theme = useTheme();
   const { t } = useTranslation();
   const router = useRouter();
@@ -44,6 +46,13 @@ export default function Index() {
   const [showAddConflictModal, setShowAddConflictModal] = useState(false);
   const [activeFilter, setActiveFilter] = useState<ConflictFilter>('all');
   const [showSplash, setShowSplash] = useState(true);
+
+  console.log('[INDEX] Auth state:', { 
+    hasUser: !!user, 
+    authLoading, 
+    needsProfileSetup,
+    showSplash 
+  });
   
   // Animation values for cinematic effects
   const gridOverlay = useSharedValue(0);
