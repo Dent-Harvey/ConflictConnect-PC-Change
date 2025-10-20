@@ -1,6 +1,6 @@
 import { project_id } from '@/9gen_config.json';
 
-const DB_API_BASE_URL = 'https://api.9gen.dev';
+const DB_API_BASE_URL = process.env.EXPO_PUBLIC_DB_API_BASE?.replace(/\/$/, '') || 'https://api.9gen.dev';
 
 export interface Resource {
   id: string;

@@ -2,7 +2,7 @@ import { ConflictZone } from '@/types/conflict';
 import { project_id } from '@/9gen_config.json';
 import { errorHandler } from '@/utils/errorHandler';
 
-const DB_API_BASE_URL = 'https://api.9gen.dev';
+const DB_API_BASE_URL = process.env.EXPO_PUBLIC_DB_API_BASE || 'https://api.9gen.dev';
 
 export interface ConflictSubmissionResponse {
   success: boolean;

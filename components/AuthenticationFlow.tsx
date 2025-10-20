@@ -1,18 +1,19 @@
 import { useFirebaseAuth } from '@/contexts/FirebaseAuthContext';
 import React from 'react';
-import { RoleSelectionScreen } from './RoleSelectionScreen';
+import { OnboardingFlow, useOnboardingStatus } from './OnboardingFlow';
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
 
 /**
- * AuthenticationFlow - Simplified wrapper for authentication
- * The RoleSelectionScreen manages the entire auth flow internally
+ * AuthenticationFlow - Wrapper that shows onboarding and authentication
+ * Shows welcome screens → role selection → email verification → profile setup → role-specific walkthrough
  */
 export const AuthenticationFlow: React.FC = () => {
   const { user, isLoading, needsProfileSetup } = useFirebaseAuth();
+  const { needsOnboarding, isLoading: onboardingLoading } = useOnboardingStatus();
 
   // Show loading state
-  if (isLoading) {
+  if (isLoading || onboardingLoading) {
     return (
       <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ThemedText>Loading...</ThemedText>
@@ -20,11 +21,11 @@ export const AuthenticationFlow: React.FC = () => {
     );
   }
 
-  // If user is authenticated and has complete profile, don't show auth flow
-  if (user && !needsProfileSetup) {
+  // If user is authenticated, has complete profile, and has seen onboarding, don't show auth flow
+  if (user && !needsProfileSetup && !needsOnboarding) {
     return null; // Let the main app render
   }
 
-  // RoleSelectionScreen handles the entire flow: role selection → verification → profile setup
-  return <RoleSelectionScreen />;
+  // Show onboarding flow which handles: welcome → role selection → verification → profile → walkthrough
+  return <OnboardingFlow />;
 };

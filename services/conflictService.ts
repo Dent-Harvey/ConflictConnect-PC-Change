@@ -1,8 +1,8 @@
 import { project_id } from '@/9gen_config.json';
 import { ConflictFilters, ConflictSource, ConflictZone } from '@/types/conflict';
 
-const DB_API_BASE_URL = 'https://api.9gen.dev/api';
-const NEWS_SCRAPING_API_BASE = process.env.EXPO_PUBLIC_NEWS_API_URL || 'https://conflictconnect-news.neffcreative.co';
+const DB_API_BASE_URL = process.env.EXPO_PUBLIC_DB_API_BASE || 'https://api.9gen.dev/api';
+const NEWS_SCRAPING_API_BASE = process.env.EXPO_PUBLIC_NEWS_API_BASE || process.env.EXPO_PUBLIC_NEWS_API_URL || 'https://conflictconnect-news.neffcreative.co';
 
 export class ConflictService {
   private static async makeRequest<T>(
@@ -38,7 +38,24 @@ export class ConflictService {
    */
   static async triggerNewsUpdate(): Promise<boolean> {
     try {
-      const response = await fetch(`${NEWS_SCRAPING_API_BASE}/api/scrape-news`, {
+      // Avoid unreachable localhost/LAN calls from a physical device
+      const base = (NEWS_SCRAPING_API_BASE || '').trim();
+      if (!base) {
+        console.warn('[CONFLICT SERVICE] NEWS_SCRAPING_API_BASE not set – skipping trigger in development');
+        return false;
+      }
+
+      // Lazy import to avoid adding a hard dependency at module load
+      const { Platform } = await import('react-native');
+      const isLocalHost = /^(https?:\/\/)?(localhost|127\.0\.0\.1)(:\d+)?/i.test(base);
+      const isLan = /^(https?:\/\/)?(10\.|172\.(1[6-9]|2\d|3[0-1])\.|192\.168\.)/i.test(base);
+
+      if (Platform.OS !== 'web' && (isLocalHost || isLan)) {
+        console.warn('[CONFLICT SERVICE] Skipping news trigger on device for local URL:', base);
+        return false;
+      }
+
+      const response = await fetch(`${base}/api/scrape-news`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,7 +68,7 @@ export class ConflictService {
 
       const result = await response.json();
       console.log('[CONFLICT SERVICE] News scraping triggered:', result.message);
-      return result.success;
+      return !!result.success;
     } catch (error) {
       console.error('[CONFLICT SERVICE] Failed to trigger news update:', error);
       return false;

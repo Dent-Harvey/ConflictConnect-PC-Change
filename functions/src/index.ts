@@ -8,15 +8,27 @@ admin.initializeApp();
 // SMTP Configuration - Use your existing email server
 const SMTP_CONFIG = {
   host: 'mail.privateemail.com',
-  port: 465,
-  secure: true,
+  port: 587,
+  secure: false, // Use STARTTLS instead of SSL
   auth: {
     user: 'conflictconnect@neffcreative.co',
     // IMPORTANT: Store password in Firebase environment config
     // Run: firebase functions:config:set smtp.password="YOUR_PASSWORD"
+    // OR set environment variable SMTP_PASSWORD
     pass: functions.config().smtp?.password || process.env.SMTP_PASSWORD,
   },
+  tls: {
+    ciphers: 'SSLv3',
+    rejectUnauthorized: false,
+  },
 };
+
+// Validate SMTP configuration on startup
+if (!SMTP_CONFIG.auth.pass) {
+  console.error('⚠️ SMTP_PASSWORD is not configured! Email service will not work.');
+  console.error('To fix: firebase functions:config:set smtp.password="YOUR_PASSWORD"');
+  console.error('OR set environment variable SMTP_PASSWORD');
+}
 
 // Create reusable transporter
 const createTransporter = () => {

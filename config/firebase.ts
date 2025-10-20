@@ -1,8 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { initializeApp } from 'firebase/app';
-import { connectAuthEmulator, getAuth, initializeAuth } from 'firebase/auth';
-import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+import { FirebaseApp, initializeApp } from 'firebase/app';
+// @ts-ignore - getReactNativePersistence exists in firebase/auth for React Native builds
+import { Auth, connectAuthEmulator, getAuth, getReactNativePersistence, initializeAuth } from 'firebase/auth';
+import { Firestore, connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
+import { FirebaseStorage, getStorage } from 'firebase/storage';
+import { Platform } from 'react-native';
 
 console.log('[FIREBASE] Initializing Firebase...');
 
@@ -17,19 +19,24 @@ const firebaseConfig = {
   measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-32SPXWQ1VV"
 };
 
-let app, auth, db;
+let app: FirebaseApp, auth: Auth, db: Firestore;
 
 try {
   // Initialize Firebase
   app = initializeApp(firebaseConfig);
   console.log('[FIREBASE] App initialized');
 
-  // Initialize Auth with AsyncStorage persistence
-  // @ts-ignore - Using AsyncStorage directly for React Native
-  auth = initializeAuth(app, {
-    persistence: AsyncStorage as any
-  });
-  console.log('[FIREBASE] Auth initialized');
+  // Initialize Auth
+  if (Platform.OS === 'web') {
+    auth = getAuth(app);
+    console.log('[FIREBASE] Web Auth initialized');
+  } else {
+    // React Native persistence for native platforms
+    auth = initializeAuth(app, {
+      persistence: getReactNativePersistence(AsyncStorage),
+    });
+    console.log('[FIREBASE] Native Auth initialized with React Native persistence');
+  }
 
   db = getFirestore(app);
   console.log('[FIREBASE] Firestore initialized');
@@ -50,7 +57,7 @@ if (__DEV__) {
   }
 }
 
-const storage = getStorage(app);
+const storage: FirebaseStorage = getStorage(app);
 
 export { app, auth, db, storage };
 export default app;

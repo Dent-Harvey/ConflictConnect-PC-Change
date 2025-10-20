@@ -1,7 +1,7 @@
 import { RelatedCharity } from '@/types/conflict';
 import { project_id } from '@/9gen_config.json';
 
-const DB_API_BASE_URL = 'https://api.9gen.dev/api';
+const DB_API_BASE_URL = process.env.EXPO_PUBLIC_DB_API_BASE || 'https://api.9gen.dev/api';
 
 /**
  * Get charities related to a specific conflict zone based on location and conflict type
